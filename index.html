@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html_content = """<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -274,7 +274,7 @@
         osc.stop(t + 0.1);
     }
 
-    // --- 完全新規：プロシージャルBGM生成システム（外部ファイル一切不要） ---
+    // --- プロシージャルBGM生成システム（音量をさらに控えめに修正） ---
     let bgmNodes = [];
     let bgmIntervals = [];
 
@@ -290,10 +290,10 @@
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const t = audioCtx.currentTime;
         
-        // メイン音量コントロール（フェードイン）
+        // メイン音量コントロール（音量を従来の0.1から0.02へ下げ、心地よいバックグラウンド音に調整）
         const masterGain = audioCtx.createGain();
         masterGain.gain.setValueAtTime(0, t);
-        masterGain.gain.linearRampToValueAtTime(0.1, t + 2); // 控えめな音量でアンビエントを演出
+        masterGain.gain.linearRampToValueAtTime(0.02, t + 2); 
         masterGain.connect(audioCtx.destination);
         
         // リセット用に保存
@@ -318,13 +318,13 @@
         if (mode === 'psycho') {
             // サイコパス：不穏な低音のうねり
             const osc1 = addOsc('sawtooth', 55);
-            const osc2 = addOsc('sawtooth', 56.5); // わずかにズラして不快なうねりを作る
+            const osc2 = addOsc('sawtooth', 56.5); 
             osc1.connect(masterGain);
             osc2.connect(masterGain);
         } else if (mode === 'talent') {
             // 才能覚醒：高速思考を思わせるデジタルパルス
             const osc = addOsc('square', 110);
-            const lfo = addOsc('square', 12); // 高速パルス
+            const lfo = addOsc('square', 12); 
             const tremolo = audioCtx.createGain();
             lfo.connect(tremolo.gain);
             osc.connect(tremolo);
@@ -332,8 +332,8 @@
         } else if (mode === 'future') {
             // 時空転生：宇宙的でスピリチュアルな和音
             const osc1 = addOsc('sine', 220);
-            const osc2 = addOsc('sine', 329.63); // 完全五度
-            const lfo = addOsc('sine', 0.2); // ゆっくりとした明滅
+            const osc2 = addOsc('sine', 329.63); 
+            const lfo = addOsc('sine', 0.2); 
             const tremolo = audioCtx.createGain();
             lfo.connect(tremolo.gain);
             osc1.connect(tremolo);
@@ -342,11 +342,11 @@
         } else if (mode === 'romance') {
             // 恋愛依存：狂気的な高い不協和音と心音ループ
             const osc1 = addOsc('triangle', 440);
-            const osc2 = addOsc('triangle', 466.16); // 半音ぶつかる不気味な響き
+            const osc2 = addOsc('triangle', 466.16); 
             osc1.connect(masterGain);
             osc2.connect(masterGain);
             
-            // プログラムで心音を合成
+            // プログラムで心音を合成（心音の音量も同様に引き下げ）
             const interval = setInterval(() => {
                 if (audioCtx.state === 'suspended') return;
                 const time = audioCtx.currentTime;
@@ -355,7 +355,7 @@
                 kick.type = 'sine';
                 kick.frequency.setValueAtTime(150, time);
                 kick.frequency.exponentialRampToValueAtTime(10, time + 0.4);
-                kickGain.gain.setValueAtTime(0.8, time);
+                kickGain.gain.setValueAtTime(0.15, time); 
                 kickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
                 kick.connect(kickGain);
                 kickGain.connect(masterGain);
@@ -365,7 +365,7 @@
             bgmIntervals.push(interval);
         } else if (mode === 'mental') {
             // メンタル強度：深海に沈むような極低音のサイン波
-            const osc = addOsc('sine', 40); // ギリギリ聞こえるかどうかの低音
+            const osc = addOsc('sine', 40); 
             const lfo = addOsc('sine', 0.3);
             const modGain = audioCtx.createGain();
             modGain.gain.value = 5;
@@ -607,7 +607,7 @@
                 { text: "頼まれごとをされると、自分が忙しくても断りきれない。", score: 2 },
                 { text: "日常の些細なタスク（掃除やメール返信など）が、とてつもなく重労働に感じる。", score: 2 },
                 { text: "自分が今の立場や評価に見合っていない「偽物」だと感じることがある。", score: 2 },
-                { text: "誰かが怒られているのを見ると、自分が責められているように錯覚する。", score: 3 },
+                { text: "誰かが怒られているのを見るだけで、自分が責められているように錯覚する。", score: 3 },
                 { text: "最悪の事態ばかりを想像してしまい、行動を起こせなくなる。", score: 3 },
                 { text: "休日でも仕事や学校のことが頭から離れず、全く休まらない。", score: 2 }
             ],
@@ -722,4 +722,8 @@
 </script>
 
 </body>
-</html>
+</html>"""
+
+with open("shindan_system_v2.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+print("File shindan_system_v2.html generated successfully.")
