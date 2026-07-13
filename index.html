@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>【無料診断】あなたの隠された裏性格</title>
+    <title>【無料】おもしろ診断・占い研究所</title>
     <style>
+        /* 全端末共通の基本リセット */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -23,7 +24,7 @@
             min-height: 100vh;
         }
 
-        /* 広告配置エリアの共通スタイル */
+        /* 💡 広告配置コンテナ（PC・スマホ両対応） */
         .ad-container {
             width: 100%;
             max-width: 450px;
@@ -38,13 +39,15 @@
             margin: 10px 0;
             border-radius: 8px;
             text-align: center;
+            flex-shrink: 0;
         }
 
+        /* 📱 アプリ本体の器（幅を450pxに固定して両脇に余白を作るプロ設計） */
         #app-container {
             width: 100%;
             max-width: 450px;
             height: 70vh;
-            min-height: 480px;
+            min-height: 460px;
             background-color: #161622;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
@@ -102,7 +105,8 @@
             gap: 12px;
         }
 
-        button {
+        /* メニュー用のリンクボタン・診断用のボタン共通 */
+        button, .menu-btn {
             background-color: #202030;
             color: #ffffff;
             border: 1px solid #3a3a50;
@@ -114,9 +118,12 @@
             width: 100%;
             font-weight: 500;
             font-family: inherit;
+            text-decoration: none;
+            display: block;
+            text-align: center;
         }
 
-        button:active {
+        button:active, .menu-btn:active {
             background-color: #8a2be2;
             border-color: #8a2be2;
             transform: scale(0.98);
@@ -136,62 +143,76 @@
 </head>
 <body>
 
-    <!-- 💡 上部広告枠：審査通過後にGoogleのコードをここに入れます -->
     <div class="ad-container" id="top-ad">
-        【スポンサーリンク（広告枠）】
+        【スポンサーリンク（広告表示エリア）】
     </div>
 
-    <!-- 📱 診断ゲーム本体 -->
     <div id="app-container">
         <div id="progress-container">
             <div id="progress-bar"></div>
         </div>
-        <div id="question-number"></div>
+        <div id="question-number">MENU</div>
         <div id="content-area">
-            <div id="main-text">読込中...</div>
+            <div id="main-text" style="font-size: 1.4rem; color: #a252ff;">🔮 診断・占いポータル 🔮</div>
+            <p style="color: #aaa; font-size: 0.9.rem; margin-bottom: 20px;">あなたの隠された本性を暴く、厳選心理テスト</p>
         </div>
-        <div id="action-area"></div>
+        <div id="action-area">
+            <a href="?id=psycho" class="menu-btn" style="border-left: 4px solid #ff3333;">1. あなたの隠された裏性格・サイコパス診断</a>
+            <a href="?id=talent" class="menu-btn" style="border-left: 4px solid #33ff33; margin-top: 5px;">2. 近日公開：裏の才能と本当に向いている適職占い</a>
+            <a href="?id=future" class="menu-btn" style="border-left: 4px solid #3333ff; margin-top: 5px;">3. 近日公開：時空の歪みから導く「来世の職業」</a>
+        </div>
     </div>
 
-    <!-- 💡 下部広告枠：審査通過後にGoogleのコードをここに入れます -->
     <div class="ad-container" id="bottom-ad">
-        【スポンサーリンク（広告枠）】
+        【スポンサーリンク（広告表示エリア）】
     </div>
 
 <script>
-    // 診断のデータ設定
-    const config = {
-        title: "あなたの隠された裏性格診断",
-        questions: [
-            { text: "休日は一人で過ごす方が回復する？", score: 1 },
-            { text: "他人の嘘は割とすぐに見抜ける方だ？", score: 2 },
-            { text: "計画通りに進まないとイライラする？", score: 1 },
-            { text: "ホラー映画や怪談はどちらかといえば好き？", score: 2 },
-            { text: "買い物をするとき、直感で即決することが多い？", score: 1 },
-            { text: "人から「掴みどころがない」と言われたことがある？", score: 2 },
-            { text: "約束の時間には必ず5分前には到着する？", score: 1 },
-            { text: "宝くじで大金が当たったら、誰にも言わずに隠す？", score: 2 },
-            { text: "理不尽なルールには従いたくないと思う？", score: 2 },
-            { text: "自分には、他人に明かしていない秘密の趣味がある？", score: 3 }
-        ],
-        results: [
-            { maxScore: 7, text: "【堅実な常識人タイプ】\nあなたは表裏が少なく、社会的な信頼性の高い人物です。周囲からは真面目で安心できる存在と思われていますが、たまには自分の本音を爆発させる時間も大切に。" },
-            { maxScore: 12, text: "【隠れミステリアスタイプ】\nあなたは表面上うまく周囲に合わせていますが、内面には独自の鋭い世界観を持っています。他人の本質を見抜く目が長けている、一筋縄ではいかない人物です。" },
-            { maxScore: 20, text: "【孤高のインテリジェンスタイプ】\nあなたの裏の顔は、完全な合理主義者です。感情に流されず、物事を客観的に処理する冷徹なまでの知性を持っています。秘密主義で、自分のテリトリーを守る傾向があります。" }
-        ]
+    // 💡 拡張データ：今後新しい診断を増やす時は、この中にテキストを追加するだけ！ファイル分割不要！
+    const shindanDatabase = {
+        psycho: {
+            title: "あなたの隠された裏性格診断",
+            questions: [
+                { text: "休日は一人で過ごす方が回復する？", score: 1 },
+                { text: "他人の嘘は割とすぐに見抜ける方だ？", score: 2 },
+                { text: "計画通りに進まないとイライラする？", score: 1 },
+                { text: "ホラー映画や怪談はどちらかといえば好き？", score: 2 },
+                { text: "買い物をするとき、直感で即決することが多い？", score: 1 },
+                { text: "人から「掴みどころがない」と言われたことがある？", score: 2 },
+                { text: "約束の時間には必ず5分前には到着する？", score: 1 },
+                { text: "宝くじで大金が当たったら、誰にも言わずに隠す？", score: 2 },
+                { text: "理不尽なルールには従いたくないと思う？", score: 2 },
+                { text: "自分には、他人に明かしていない秘密の趣味がある？", score: 3 }
+            ],
+            results: [
+                { maxScore: 7, text: "【堅実な常識人タイプ】\nあなたは表裏が少なく、社会的な信頼性の高い人物です。真面目で安心できる存在と思われていますが、たまには本音を爆発させる時間も大切に。" },
+                { maxScore: 12, text: "【隠れミステリアスタイプ】\n表面上うまく周囲に合わせていますが、内面には独自の鋭い世界観を持っています。他人の本質を見抜く目が長けている人物です。" },
+                { maxScore: 20, text: "【孤高のインテリジェンスタイプ】\nあなたの裏の顔は、完全な合理主義者です。感情に流されず、物事を客観的に処理する冷徹なまでの知性を持っています。秘密主義な傾向があります。" }
+            ]
+        }
+        // 新しい診断（talentやfuture）はここに後からコピペで追加されます！
     };
+
+    // URLのパラメーター（?id=xxx）を自動解析するシステム
+    const urlParams = new URLSearchParams(window.location.search);
+    const shindanId = urlParams.get('id');
 
     let currentIdx = 0;
     let totalScore = 0;
+    let currentData = null;
 
     function initApp() {
-        document.title = config.title;
-        showStart();
+        // パラメーターに対応する診断データがある場合のみ診断をスタート、なければメニューを表示
+        if (shindanId && shindanDatabase[shindanId]) {
+            currentData = shindanDatabase[shindanId];
+            document.title = currentData.title;
+            startShindan();
+        }
     }
 
-    function showStart() {
+    function startShindan() {
         document.getElementById("question-number").innerText = "START";
-        document.getElementById("main-text").innerText = config.title + "\n\n10の質問で、あなたの本質を暴きます。";
+        document.getElementById("main-text").innerText = currentData.title + "\n\n10の質問で、あなたの本質を暴きます。";
         
         const area = document.getElementById("action-area");
         area.innerHTML = "";
@@ -202,23 +223,22 @@
     }
 
     function loadQuestion() {
-        if (currentIdx >= config.questions.length) {
+        if (currentIdx >= currentData.questions.length) {
             showAdScreen();
             return;
         }
 
-        const progress = ((currentIdx) / config.questions.length) * 100;
+        const progress = ((currentIdx) / currentData.questions.length) * 100;
         document.getElementById("progress-bar").style.width = `${progress}%`;
-        document.getElementById("question-number").innerText = `質問 ${currentIdx + 1} / ${config.questions.length}`;
-        
-        document.getElementById("main-text").innerText = config.questions[currentIdx].text;
+        document.getElementById("question-number").innerText = `質問 ${currentIdx + 1} / ${currentData.questions.length}`;
+        document.getElementById("main-text").innerText = currentData.questions[currentIdx].text;
 
         const area = document.getElementById("action-area");
         area.innerHTML = "";
 
         const btnYes = document.createElement("button");
         btnYes.innerText = "はい";
-        btnYes.onclick = () => { totalScore += config.questions[currentIdx].score; currentIdx++; loadQuestion(); };
+        btnYes.onclick = () => { totalScore += currentData.questions[currentIdx].score; currentIdx++; loadQuestion(); };
         
         const btnNo = document.createElement("button");
         btnNo.innerText = "いいえ";
@@ -229,7 +249,6 @@
     }
 
     function showAdScreen() {
-        // サンクコスト効果を利用したカウントダウン演出
         document.getElementById("progress-bar").style.width = "100%";
         document.getElementById("question-number").innerText = "ANALYZING";
         document.getElementById("app-container").classList.add("ad-screen");
@@ -256,8 +275,8 @@
         document.getElementById("app-container").classList.remove("ad-screen");
         document.getElementById("question-number").innerText = "RESULT";
         
-        let finalResult = config.results[config.results.length - 1].text;
-        for (let r of config.results) {
+        let finalResult = currentData.results[currentData.results.length - 1].text;
+        for (let r of currentData.results) {
             if (totalScore <= r.maxScore) {
                 finalResult = r.text;
                 break;
@@ -269,10 +288,12 @@
 
         const area = document.getElementById("action-area");
         area.innerHTML = "";
-        const btn = document.createElement("button");
-        btn.innerText = "もう一度診断する";
-        btn.onclick = () => location.reload();
-        area.appendChild(btn);
+        
+        // メニューに戻るボタン
+        const btnMenu = document.createElement("button");
+        btnMenu.innerText = "トップメニューに戻る";
+        btnMenu.onclick = () => window.location.href = window.location.pathname;
+        area.appendChild(btnMenu);
     }
 
     initApp();
