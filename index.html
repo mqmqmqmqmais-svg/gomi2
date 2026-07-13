@@ -95,7 +95,6 @@
             flex-direction: column;
         }
 
-        /* 画面切り替え用のコンテナ */
         .screen {
             display: none;
             flex-direction: column;
@@ -183,7 +182,6 @@
             background: var(--border-color);
         }
 
-        /* 🏠 ホームボタン */
         .home-btn {
             background: transparent;
             border: 1px dashed #666;
@@ -255,7 +253,6 @@
 <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
-    // --- 既存のクリック効果音 ---
     function playHeavyClick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const t = audioCtx.currentTime;
@@ -267,14 +264,13 @@
         osc.type = 'sine';
         osc.frequency.setValueAtTime(300, t);
         osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
-        gain.gain.setValueAtTime(0.1, t);
-        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+        gain.gain.setValueAtTime(0.03, t); // クリック音も微調整
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
         
         osc.start(t);
         osc.stop(t + 0.1);
     }
 
-    // --- プロシージャルBGM生成システム（音量をさらに控えめに修正） ---
     let bgmNodes = [];
     let bgmIntervals = [];
 
@@ -290,13 +286,18 @@
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const t = audioCtx.currentTime;
         
-        // メイン音量コントロール（音量を従来の0.1から0.02へ下げ、心地よいバックグラウンド音に調整）
         const masterGain = audioCtx.createGain();
         masterGain.gain.setValueAtTime(0, t);
-        masterGain.gain.linearRampToValueAtTime(0.02, t + 2); 
+        
+        // 5(mental)の重低音は0.02を維持、それ以外(1〜4)は70%カットして0.006に設定
+        let targetVolume = 0.02;
+        if (mode !== 'mental') {
+            targetVolume = 0.006;
+        }
+        
+        masterGain.gain.linearRampToValueAtTime(targetVolume, t + 2); 
         masterGain.connect(audioCtx.destination);
         
-        // リセット用に保存
         bgmNodes.push({
             stop: () => {
                 const now = audioCtx.currentTime;
@@ -316,13 +317,11 @@
         };
 
         if (mode === 'psycho') {
-            // サイコパス：不穏な低音のうねり
             const osc1 = addOsc('sawtooth', 55);
             const osc2 = addOsc('sawtooth', 56.5); 
             osc1.connect(masterGain);
             osc2.connect(masterGain);
         } else if (mode === 'talent') {
-            // 才能覚醒：高速思考を思わせるデジタルパルス
             const osc = addOsc('square', 110);
             const lfo = addOsc('square', 12); 
             const tremolo = audioCtx.createGain();
@@ -330,7 +329,6 @@
             osc.connect(tremolo);
             tremolo.connect(masterGain);
         } else if (mode === 'future') {
-            // 時空転生：宇宙的でスピリチュアルな和音
             const osc1 = addOsc('sine', 220);
             const osc2 = addOsc('sine', 329.63); 
             const lfo = addOsc('sine', 0.2); 
@@ -340,13 +338,12 @@
             osc2.connect(tremolo);
             tremolo.connect(masterGain);
         } else if (mode === 'romance') {
-            // 恋愛依存：狂気的な高い不協和音と心音ループ
             const osc1 = addOsc('triangle', 440);
             const osc2 = addOsc('triangle', 466.16); 
             osc1.connect(masterGain);
             osc2.connect(masterGain);
             
-            // プログラムで心音を合成（心音の音量も同様に引き下げ）
+            // 心音ループの音量も70%カット (0.15 -> 0.045)
             const interval = setInterval(() => {
                 if (audioCtx.state === 'suspended') return;
                 const time = audioCtx.currentTime;
@@ -355,8 +352,8 @@
                 kick.type = 'sine';
                 kick.frequency.setValueAtTime(150, time);
                 kick.frequency.exponentialRampToValueAtTime(10, time + 0.4);
-                kickGain.gain.setValueAtTime(0.15, time); 
-                kickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
+                kickGain.gain.setValueAtTime(0.045, time); 
+                kickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
                 kick.connect(kickGain);
                 kickGain.connect(masterGain);
                 kick.start(time);
@@ -364,7 +361,6 @@
             }, 1000);
             bgmIntervals.push(interval);
         } else if (mode === 'mental') {
-            // メンタル強度：深海に沈むような極低音のサイン波
             const osc = addOsc('sine', 40); 
             const lfo = addOsc('sine', 0.3);
             const modGain = audioCtx.createGain();
@@ -375,7 +371,6 @@
         }
     }
 
-    /* 🌌 Canvasエフェクトロジック */
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -388,8 +383,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
     class Particle {
-        constructor() { this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
             if(particleMode === 'psycho') {
                 this.x = Math.random() * canvas.width;
@@ -485,7 +479,6 @@
     }
     animateParticles();
 
-    /* 💡 テーマ別データベース（全15問） */
     const shindanDatabase = {
         psycho: {
             title: "☠ サイコパス狂気診断", mode: "psycho",
@@ -619,7 +612,6 @@
         }
     };
 
-    /* SPA ロジック */
     let currentIdx = 0, totalScore = 0, currentData = null;
     const defaultTheme = { bg: "#000000", card: "rgba(10, 10, 15, 0.98)", accent: "#a252ff", glow: "rgba(162, 82, 255, 0.8)", border: "#5c2ea6", btn: "linear-gradient(180deg, #1f1135, #05020a)" };
 
@@ -642,7 +634,7 @@
 
     function goHome() {
         playHeavyClick();
-        stopBGM(); // ホームに戻る時にBGMを停止
+        stopBGM(); 
         applyTheme(defaultTheme, 'default');
         switchScreen('screen-menu');
         document.title = "【極限超越】次元崩壊・超・診断占いシステム";
@@ -658,7 +650,7 @@
         document.title = currentData.title;
         switchScreen('screen-quiz');
         
-        playThemeBGM(currentData.mode); // 診断開始と同時に専用BGMを再生
+        playThemeBGM(currentData.mode); 
         
         document.getElementById("quiz-header").innerText = currentData.title;
         document.getElementById("quiz-content").innerHTML = `<div class="main-text">${currentData.title}<br><br><span style="font-size:1rem;font-weight:normal;">全15問の診断を開始します。</span></div>`;
@@ -723,4 +715,3 @@
 
 </body>
 </html>
-
