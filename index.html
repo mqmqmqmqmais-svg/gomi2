@@ -241,10 +241,11 @@
                 <div id="progress-bar"></div>
             </div>
             <div class="header-title" id="quiz-header">READY</div>
+            
             <div class="content-area" id="quiz-content">
-                </div>
+            </div>
             <div class="action-area" id="quiz-action">
-                </div>
+            </div>
         </div>
 
     </div>
@@ -253,6 +254,8 @@
 
 <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // --- 既存のクリック効果音 ---
     function playHeavyClick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const t = audioCtx.currentTime;
@@ -263,12 +266,113 @@
         
         osc.type = 'sine';
         osc.frequency.setValueAtTime(300, t);
-        osc.frequency.exponentialRampToValueAtTime(50, t + 0.1); 
+        osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
         gain.gain.setValueAtTime(0.1, t);
         gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
         
         osc.start(t);
         osc.stop(t + 0.1);
+    }
+
+    // --- 完全新規：プロシージャルBGM生成システム（外部ファイル一切不要） ---
+    let bgmNodes = [];
+    let bgmIntervals = [];
+
+    function stopBGM() {
+        bgmNodes.forEach(node => { try{ node.stop(); node.disconnect(); }catch(e){} });
+        bgmIntervals.forEach(clearInterval);
+        bgmNodes = [];
+        bgmIntervals = [];
+    }
+
+    function playThemeBGM(mode) {
+        stopBGM();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const t = audioCtx.currentTime;
+        
+        // メイン音量コントロール（フェードイン）
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0, t);
+        masterGain.gain.linearRampToValueAtTime(0.1, t + 2); // 控えめな音量でアンビエントを演出
+        masterGain.connect(audioCtx.destination);
+        
+        // リセット用に保存
+        bgmNodes.push({
+            stop: () => {
+                const now = audioCtx.currentTime;
+                masterGain.gain.cancelScheduledValues(now);
+                masterGain.gain.linearRampToValueAtTime(0, now + 1);
+            },
+            disconnect: () => setTimeout(() => masterGain.disconnect(), 1000)
+        });
+
+        const addOsc = (type, freq) => {
+            const osc = audioCtx.createOscillator();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.start();
+            bgmNodes.push(osc);
+            return osc;
+        };
+
+        if (mode === 'psycho') {
+            // サイコパス：不穏な低音のうねり
+            const osc1 = addOsc('sawtooth', 55);
+            const osc2 = addOsc('sawtooth', 56.5); // わずかにズラして不快なうねりを作る
+            osc1.connect(masterGain);
+            osc2.connect(masterGain);
+        } else if (mode === 'talent') {
+            // 才能覚醒：高速思考を思わせるデジタルパルス
+            const osc = addOsc('square', 110);
+            const lfo = addOsc('square', 12); // 高速パルス
+            const tremolo = audioCtx.createGain();
+            lfo.connect(tremolo.gain);
+            osc.connect(tremolo);
+            tremolo.connect(masterGain);
+        } else if (mode === 'future') {
+            // 時空転生：宇宙的でスピリチュアルな和音
+            const osc1 = addOsc('sine', 220);
+            const osc2 = addOsc('sine', 329.63); // 完全五度
+            const lfo = addOsc('sine', 0.2); // ゆっくりとした明滅
+            const tremolo = audioCtx.createGain();
+            lfo.connect(tremolo.gain);
+            osc1.connect(tremolo);
+            osc2.connect(tremolo);
+            tremolo.connect(masterGain);
+        } else if (mode === 'romance') {
+            // 恋愛依存：狂気的な高い不協和音と心音ループ
+            const osc1 = addOsc('triangle', 440);
+            const osc2 = addOsc('triangle', 466.16); // 半音ぶつかる不気味な響き
+            osc1.connect(masterGain);
+            osc2.connect(masterGain);
+            
+            // プログラムで心音を合成
+            const interval = setInterval(() => {
+                if (audioCtx.state === 'suspended') return;
+                const time = audioCtx.currentTime;
+                const kick = audioCtx.createOscillator();
+                const kickGain = audioCtx.createGain();
+                kick.type = 'sine';
+                kick.frequency.setValueAtTime(150, time);
+                kick.frequency.exponentialRampToValueAtTime(10, time + 0.4);
+                kickGain.gain.setValueAtTime(0.8, time);
+                kickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
+                kick.connect(kickGain);
+                kickGain.connect(masterGain);
+                kick.start(time);
+                kick.stop(time + 0.4);
+            }, 1000);
+            bgmIntervals.push(interval);
+        } else if (mode === 'mental') {
+            // メンタル強度：深海に沈むような極低音のサイン波
+            const osc = addOsc('sine', 40); // ギリギリ聞こえるかどうかの低音
+            const lfo = addOsc('sine', 0.3);
+            const modGain = audioCtx.createGain();
+            modGain.gain.value = 5;
+            lfo.connect(modGain);
+            modGain.connect(osc.frequency);
+            osc.connect(masterGain);
+        }
     }
 
     /* 🌌 Canvasエフェクトロジック */
@@ -283,21 +387,19 @@
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-
     class Particle {
-        constructor() { this.reset(); }
+        constructor() { this.reset();
+        }
         reset() {
             if(particleMode === 'psycho') {
-                // 【エフェクト1・変更】高速で横切る赤黒い斬撃（レーザー）
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.vx = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 20 + 10);
                 this.vy = 0;
-                this.width = Math.random() * 100 + 20; // 横に長い線
+                this.width = Math.random() * 100 + 20;
                 this.height = Math.random() * 3 + 1;
                 this.color = `rgba(255, 0, ${Math.random()*30}, ${Math.random() * 0.8 + 0.2})`;
             } else if(particleMode === 'talent') {
-                // 【エフェクト2】マトリックス（上から下へ等速落下）
                 this.x = Math.floor(Math.random() * (canvas.width/20)) * 20;
                 this.y = -Math.random() * canvas.height;
                 this.vx = 0;
@@ -306,17 +408,15 @@
                 this.color = `rgba(0, 255, ${Math.random()*150+100}, 0.9)`;
                 this.char = String.fromCharCode(0x30A0 + Math.random() * 96);
             } else if(particleMode === 'future') {
-                // 【エフェクト3】ワープ（中央から放射状に拡大）
                 this.x = canvas.width / 2;
                 this.y = canvas.height / 2;
                 const angle = Math.random() * Math.PI * 2;
                 const speed = Math.random() * 10 + 2;
                 this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed; 
+                this.vy = Math.sin(angle) * speed;
                 this.size = Math.random() * 2 + 1;
                 this.color = `rgba(255, ${Math.random()*100+150}, 0, 0.8)`;
             } else if(particleMode === 'romance') {
-                // 【エフェクト4】狂愛の竜巻（画面外周から中心へ向かって渦巻く）
                 this.angle = Math.random() * Math.PI * 2;
                 this.radius = Math.random() * canvas.width;
                 this.speed = Math.random() * 0.05 + 0.01;
@@ -324,7 +424,6 @@
                 this.size = Math.random() * 3 + 1;
                 this.color = `rgba(255, ${Math.random()*100}, ${Math.random()*100 + 100}, 0.8)`;
             } else if(particleMode === 'mental') {
-                // 【エフェクト5】奈落の泡（深海の下から上へ高速で揺らめきながら上昇）
                 this.x = Math.random() * canvas.width;
                 this.y = canvas.height + Math.random() * 100;
                 this.vx = (Math.random() - 0.5) * 2;
@@ -332,7 +431,6 @@
                 this.size = Math.random() * 5 + 2;
                 this.color = `rgba(0, ${Math.random()*150+100}, 255, 0.6)`;
             } else {
-                // デフォルト（紫の粒子が漂う）
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.vx = (Math.random() - 0.5);
@@ -349,7 +447,7 @@
                 this.angle += this.speed;
                 this.radius -= 2; 
                 this.x = canvas.width / 2 + Math.cos(this.angle) * this.radius;
-                this.y -= 1; 
+                this.y -= 1;
                 if (this.radius < 10 || this.y < 0) this.reset();
             } else if(particleMode === 'mental') {
                 this.x += this.vx;
@@ -369,7 +467,6 @@
                 ctx.font = 'bold 18px monospace';
                 ctx.fillText(this.char, this.x, this.y);
             } else if(particleMode === 'psycho') {
-                // 斬撃（四角形）
                 ctx.fillRect(this.x, this.y, this.width, this.height);
             } else {
                 ctx.beginPath();
@@ -380,7 +477,6 @@
     }
 
     for (let i = 0; i < 200; i++) particles.push(new Particle());
-
     function animateParticles() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -389,7 +485,7 @@
     }
     animateParticles();
 
-    /* 💡 テーマ別データベース（全15問に拡張！） */
+    /* 💡 テーマ別データベース（全15問） */
     const shindanDatabase = {
         psycho: {
             title: "☠ サイコパス狂気診断", mode: "psycho",
@@ -523,7 +619,7 @@
         }
     };
 
-    /* SPA ロジック（URL移動なしで画面を切り替える） */
+    /* SPA ロジック */
     let currentIdx = 0, totalScore = 0, currentData = null;
     const defaultTheme = { bg: "#000000", card: "rgba(10, 10, 15, 0.98)", accent: "#a252ff", glow: "rgba(162, 82, 255, 0.8)", border: "#5c2ea6", btn: "linear-gradient(180deg, #1f1135, #05020a)" };
 
@@ -546,6 +642,7 @@
 
     function goHome() {
         playHeavyClick();
+        stopBGM(); // ホームに戻る時にBGMを停止
         applyTheme(defaultTheme, 'default');
         switchScreen('screen-menu');
         document.title = "【極限超越】次元崩壊・超・診断占いシステム";
@@ -560,6 +657,8 @@
         applyTheme(currentData.theme, currentData.mode);
         document.title = currentData.title;
         switchScreen('screen-quiz');
+        
+        playThemeBGM(currentData.mode); // 診断開始と同時に専用BGMを再生
         
         document.getElementById("quiz-header").innerText = currentData.title;
         document.getElementById("quiz-content").innerHTML = `<div class="main-text">${currentData.title}<br><br><span style="font-size:1rem;font-weight:normal;">全15問の診断を開始します。</span></div>`;
@@ -577,7 +676,6 @@
         document.getElementById("quiz-header").innerText = `QUESTION: ${currentIdx + 1} / ${currentData.questions.length}`;
         
         document.getElementById("quiz-content").innerHTML = `<div class="main-text">${currentData.questions[currentIdx].text}</div>`;
-        
         document.getElementById("quiz-action").innerHTML = `
             <button onclick="answer(true)">はい / YES</button>
             <button onclick="answer(false)">いいえ / NO</button>
@@ -616,7 +714,6 @@
     function showResult() {
         playHeavyClick();
         document.getElementById("quiz-header").innerText = "RESULT";
-        
         let res = currentData.results.find(r => totalScore <= r.maxScore) || currentData.results[currentData.results.length-1];
         
         document.getElementById("quiz-content").innerHTML = `<div class="main-text" style="font-size:1.2rem; text-align:left; padding:10px;">${res.text}</div>`;
