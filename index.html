@@ -5,7 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>【無料】おもしろ診断・占い研究所</title>
     <style>
-        /* 全端末共通の基本リセット */
+        /* 🎨 カラー変数の初期値（Javascriptで診断ごとに自動で上書きされます） */
+        :root {
+            --bg-color: #0f0f15;
+            --card-bg: #161622;
+            --accent-color: #8a2be2;
+            --accent-gradient: linear-gradient(90deg, #8a2be2, #4a00e0);
+            --border-color: #2b2b3d;
+            --text-color: #e0e0e8;
+            --btn-bg: #202030;
+            --btn-border: #3a3a50;
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -13,8 +24,8 @@
         }
         
         body {
-            background-color: #0f0f15;
-            color: #e0e0e8;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             padding: 0;
@@ -22,15 +33,16 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            transition: background-color 0.5s ease;
         }
 
-        /* 💡 広告配置コンテナ（PC・スマホ両対応） */
+        /* 💡 広告配置コンテナ */
         .ad-container {
             width: 100%;
             max-width: 450px;
             min-height: 60px;
-            background-color: #1a1a26;
-            border: 1px dashed #3a3a50;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px dashed var(--btn-border);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -42,35 +54,61 @@
             flex-shrink: 0;
         }
 
-        /* 📱 アプリ本体の器（幅を450pxに固定して両脇に余白を作るプロ設計） */
+        /* 🏠 ホーム戻りボタンの配置用ヘッダー */
+        #app-header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+        .home-back-btn {
+            background: none;
+            border: none;
+            color: #8a8a9e;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            width: auto;
+        }
+        .home-back-btn:active {
+            color: var(--accent-color);
+            transform: none;
+        }
+
+        /* 📱 アプリ本体の器（アニメーション付き） */
         #app-container {
             width: 100%;
             max-width: 450px;
-            height: 70vh;
-            min-height: 460px;
-            background-color: #161622;
+            height: 72vh;
+            min-height: 480px;
+            background-color: var(--card-bg);
             border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid #2b2b3d;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
             padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
+            transition: all 0.5s ease;
+            animation: fadeIn 0.5s ease-out;
         }
 
         #progress-container {
             width: 100%;
             height: 6px;
-            background-color: #252538;
+            background-color: rgba(255,255,255,0.05);
             border-radius: 3px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         #progress-bar {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, #8a2be2, #4a00e0);
+            background: var(--accent-gradient);
             border-radius: 3px;
             transition: width 0.3s ease;
         }
@@ -78,7 +116,8 @@
         #question-number {
             font-size: 0.9rem;
             color: #8a8a9e;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
         }
 
         #content-area {
@@ -88,10 +127,11 @@
             justify-content: center;
             align-items: center;
             text-align: center;
+            animation: fadeIn 0.3s ease-out;
         }
 
         #main-text {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             line-height: 1.6;
             font-weight: bold;
             margin-bottom: 30px;
@@ -105,73 +145,126 @@
             gap: 12px;
         }
 
-        /* メニュー用のリンクボタン・診断用のボタン共通 */
+        /* ✨ ボタンのデザインとクリックアニメーション */
         button, .menu-btn {
-            background-color: #202030;
+            background-color: var(--btn-bg);
             color: #ffffff;
-            border: 1px solid #3a3a50;
+            border: 1px solid var(--btn-border);
             padding: 16px;
             font-size: 1rem;
             cursor: pointer;
-            border-radius: 10px;
+            border-radius: 12px;
             transition: all 0.2s ease;
             width: 100%;
-            font-weight: 500;
+            font-weight: bold;
             font-family: inherit;
             text-decoration: none;
             display: block;
             text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         button:active, .menu-btn:active {
-            background-color: #8a2be2;
-            border-color: #8a2be2;
-            transform: scale(0.98);
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            transform: scale(0.96);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .ad-screen {
-            background-color: #000000 !important;
-            color: #ffffff;
-        }
-        #ad-timer {
-            font-size: 3rem;
-            color: #ffcc00;
-            font-weight: bold;
+        /* 🔄 ぐるぐる回る解析中アニメーション */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
             margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <div class="ad-container" id="top-ad">
-        【スポンサーリンク（広告表示エリア）】
-    </div>
+    <!-- 💡 上部広告枠 -->
+    <div class="ad-container" id="top-ad">【スポンサーリンク】</div>
 
+    <!-- 📱 アプリ本体 -->
     <div id="app-container">
+        <div id="app-header">
+            <!-- 🏠 診断中いつでもホームに戻れるボタン -->
+            <button class="home-back-btn" id="home-btn" style="display:none;" onclick="goHome()">🏠 ホームへ戻る</button>
+        </div>
         <div id="progress-container">
             <div id="progress-bar"></div>
         </div>
         <div id="question-number">MENU</div>
         <div id="content-area">
-            <div id="main-text" style="font-size: 1.4rem; color: #a252ff;">🔮 診断・占いポータル 🔮</div>
-            <p style="color: #aaa; font-size: 0.9.rem; margin-bottom: 20px;">あなたの隠された本性を暴く、厳選心理テスト</p>
+            <div id="main-text" style="font-size: 1.5rem; color: #a252ff; text-shadow: 0 0 10px rgba(162,82,255,0.3);">🔮 診断・占いポータル 🔮</div>
+            <p style="color: #8a8a9e; font-size: 0.95rem; margin-bottom: 20px;">あなたの隠された本性を暴く、厳選心理テスト</p>
         </div>
         <div id="action-area">
-            <a href="?id=psycho" class="menu-btn" style="border-left: 4px solid #ff3333;">1. あなたの隠された裏性格・サイコパス診断</a>
-            <a href="?id=talent" class="menu-btn" style="border-left: 4px solid #33ff33; margin-top: 5px;">2. 近日公開：裏の才能と本当に向いている適職占い</a>
-            <a href="?id=future" class="menu-btn" style="border-left: 4px solid #3333ff; margin-top: 5px;">3. 近日公開：時空の歪みから導く「来世の職業」</a>
+            <!-- 診断一覧リンク -->
+            <a href="?id=psycho" class="menu-btn" style="border-left: 5px solid #ff3333;" onclick="playClickSound()">1. あなたの隠された裏性格・サイコパス診断</a>
+            <a href="?id=talent" class="menu-btn" style="border-left: 5px solid #33ff33; margin-top: 5px;" onclick="playClickSound()">2. 【NEW】裏の才能と向いている適職占い</a>
+            <a href="?id=future" class="menu-btn" style="border-left: 5px solid #3333ff; margin-top: 5px;" onclick="playClickSound()">3. 【NEW】時空の歪みから導く「来世の職業」</a>
         </div>
     </div>
 
-    <div class="ad-container" id="bottom-ad">
-        【スポンサーリンク（広告表示エリア）】
-    </div>
+    <!-- 💡 下部広告枠 -->
+    <div class="ad-container" id="bottom-ad">【スポンサーリンク】</div>
 
 <script>
-    // 💡 拡張データ：今後新しい診断を増やす時は、この中にテキストを追加するだけ！ファイル分割不要！
+    // 🎵 音エフェクトの設定（著作権フリーのWebオーディオ生成機能を利用）
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playClickSound() {
+        // ボタンを押したときの「ピコッ」という短い高音
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playResultSound() {
+        // 結果が出たときの「シャキーン！」という華やかな音
+        const now = audioCtx.currentTime;
+        const freqs = [523.25, 659.25, 783.99, 1046.50]; // Cメジャー和音
+        freqs.forEach((f, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, now + i * 0.05);
+            gain.gain.setValueAtTime(0.08, now + i * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+            osc.start(now + i * 0.05);
+            osc.stop(now + 0.5);
+        });
+    }
+
+    // 💡 拡張データベース：カラーテーマとコンテンツを統合管理
     const shindanDatabase = {
         psycho: {
             title: "あなたの隠された裏性格診断",
+            // 診断ごとの専用カラーテーマ（赤×黒のダーク系）
+            theme: { bg: "#120a0a", card: "#1a1010", accent: "#ff3333", gradient: "linear-gradient(90deg, #ff3333, #800000)", border: "#3d2222", btn: "#2b1818", btnBorder: "#522e2e" },
             questions: [
                 { text: "休日は一人で過ごす方が回復する？", score: 1 },
                 { text: "他人の嘘は割とすぐに見抜ける方だ？", score: 2 },
@@ -187,13 +280,42 @@
             results: [
                 { maxScore: 7, text: "【堅実な常識人タイプ】\nあなたは表裏が少なく、社会的な信頼性の高い人物です。真面目で安心できる存在と思われていますが、たまには本音を爆発させる時間も大切に。" },
                 { maxScore: 12, text: "【隠れミステリアスタイプ】\n表面上うまく周囲に合わせていますが、内面には独自の鋭い世界観を持っています。他人の本質を見抜く目が長けている人物です。" },
-                { maxScore: 20, text: "【孤高のインテリジェンスタイプ】\nあなたの裏の顔は、完全な合理主義者です。感情に流されず、物事を客観的に処理する冷徹なまでの知性を持っています。秘密主義な傾向があります。" }
+                { maxScore: 20, text: "【孤高のインテリジェンスタイプ】\nあなたの裏の顔は、完全な合理主義者です。感情に流されず、物事を客観的に処理する冷徹なまでの知性を持っています。" }
+            ]
+        },
+        talent: {
+            title: "裏の才能と向いている適職占い",
+            // 診断ごとの専用カラーテーマ（緑×紺の知性派系）
+            theme: { bg: "#0a1210", card: "#101a16", accent: "#33ff99", gradient: "linear-gradient(90deg, #33ff99, #008040)", border: "#223d32", btn: "#182b23", btnBorder: "#2e5243" },
+            questions: [
+                { text: "モノの配置や整理整頓が崩れていると気になる？", score: 2 },
+                { text: "聞き手側にまわることが多い？", score: 1 },
+                { text: "数字やロジックで説明されると納得しやすい？", score: 2 },
+                { text: "文章を書いたり、アイデアを練るのが得意？", score: 1 },
+                { text: "トラブルが起きてもあまりパニックにならない？", score: 3 }
+            ],
+            results: [
+                { maxScore: 4, text: "【共感クリエイタータイプ】\n人の心の機微を察知する才能があります。カウンセラーやマーケター、芸術方面で大化けする可能性があります。" },
+                { maxScore: 10, text: "【冷徹なるストラテジストタイプ】\n物事を仕組み化し、最適解を導く才能があります。エンジニアや経営企画、データ解析の分野で無双するでしょう。" }
+            ]
+        },
+        future: {
+            title: "時空の歪みから導く「来世の職業」占い",
+            // 診断ごとの専用カラーテーマ（紫×ゴールドのファンタジー系）
+            theme: { bg: "#100a1a", card: "#181026", accent: "#ffcc00", gradient: "linear-gradient(90deg, #ffcc00, #b33600)", border: "#3a2254", btn: "#25183a", btnBorder: "#452e6b" },
+            questions: [
+                { text: "朝より夜の方が圧倒的に元気が出る？", score: 2 },
+                { text: "満員電車に乗ると魂が削られる気がする？", score: 1 },
+                { text: "猫の言葉がなんとなく理解できる気がする？", score: 3 },
+                { text: "魔法や超能力が本当にあればいいのにと思う？", score: 2 }
+            ],
+            results: [
+                { maxScore: 4, text: "【来世の職業：異世界の薬草売り】\nあなたは現世の人間関係に少し疲れ気味。来世では静かな森の奥で、のんびりと怪しい薬草を調合して大儲けするセカンドライフが待っています。" },
+                { maxScore: 10, text: "【来世の職業：大富豪のきまぐれ愛猫】\n働いたら負け。来世のあなたは、何もしなくても高級缶詰を与えられ、一日中日向ぼっこをして人間を支配する最高位の存在になります。" }
             ]
         }
-        // 新しい診断（talentやfuture）はここに後からコピペで追加されます！
     };
 
-    // URLのパラメーター（?id=xxx）を自動解析するシステム
     const urlParams = new URLSearchParams(window.location.search);
     const shindanId = urlParams.get('id');
 
@@ -201,24 +323,41 @@
     let totalScore = 0;
     let currentData = null;
 
+    function applyTheme(theme) {
+        const root = document.documentElement;
+        root.style.setProperty('--bg-color', theme.bg);
+        root.style.setProperty('--card-bg', theme.card);
+        root.style.setProperty('--accent-color', theme.accent);
+        root.style.setProperty('--accent-gradient', theme.gradient);
+        root.style.setProperty('--border-color', theme.border);
+        root.style.setProperty('--btn-bg', theme.btn);
+        root.style.setProperty('--btn-border', theme.btnBorder);
+    }
+
     function initApp() {
-        // パラメーターに対応する診断データがある場合のみ診断をスタート、なければメニューを表示
         if (shindanId && shindanDatabase[shindanId]) {
             currentData = shindanDatabase[shindanId];
+            applyTheme(currentData.theme);
             document.title = currentData.title;
+            document.getElementById("home-btn").style.display = "flex";
             startShindan();
         }
     }
 
+    function goHome() {
+        playClickSound();
+        window.location.href = window.location.pathname;
+    }
+
     function startShindan() {
         document.getElementById("question-number").innerText = "START";
-        document.getElementById("main-text").innerText = currentData.title + "\n\n10の質問で、あなたの本質を暴きます。";
+        document.getElementById("main-text").innerText = currentData.title + "\n\n質問に答えて、あなたの運命を解析します。";
         
         const area = document.getElementById("action-area");
         area.innerHTML = "";
         const btn = document.createElement("button");
         btn.innerText = "診断を始める";
-        btn.onclick = loadQuestion;
+        btn.onclick = () => { playClickSound(); loadQuestion(); };
         area.appendChild(btn);
     }
 
@@ -230,7 +369,7 @@
 
         const progress = ((currentIdx) / currentData.questions.length) * 100;
         document.getElementById("progress-bar").style.width = `${progress}%`;
-        document.getElementById("question-number").innerText = `質問 ${currentIdx + 1} / ${currentData.questions.length}`;
+        document.getElementById("question-number").innerText = `QUESTION ${currentIdx + 1} / ${currentData.questions.length}`;
         document.getElementById("main-text").innerText = currentData.questions[currentIdx].text;
 
         const area = document.getElementById("action-area");
@@ -238,11 +377,11 @@
 
         const btnYes = document.createElement("button");
         btnYes.innerText = "はい";
-        btnYes.onclick = () => { totalScore += currentData.questions[currentIdx].score; currentIdx++; loadQuestion(); };
+        btnYes.onclick = () => { playClickSound(); totalScore += currentData.questions[currentIdx].score; currentIdx++; loadQuestion(); };
         
         const btnNo = document.createElement("button");
         btnNo.innerText = "いいえ";
-        btnNo.onclick = () => { currentIdx++; loadQuestion(); };
+        btnNo.onclick = () => { playClickSound(); currentIdx++; loadQuestion(); };
 
         area.appendChild(btnYes);
         area.appendChild(btnNo);
@@ -251,16 +390,16 @@
     function showAdScreen() {
         document.getElementById("progress-bar").style.width = "100%";
         document.getElementById("question-number").innerText = "ANALYZING";
-        document.getElementById("app-container").classList.add("ad-screen");
 
         const content = document.getElementById("content-area");
         content.innerHTML = `
-            <div id="main-text">診断結果を高度解析中...<br><span style="font-size:0.8rem; color:#888;">※解析完了までしばらくお待ちください</span></div>
-            <div id="ad-timer">15</div>
+            <div id="main-text" style="font-size:1.1rem;">生体データを高度解析中...<br><span style="font-size:0.8rem; color:#888; font-weight:normal;">結果の生成までしばらくお待ちください</span></div>
+            <div class="spinner"></div>
+            <div id="ad-timer" style="font-size:1.5rem; margin-top:15px; color:var(--accent-color);">7</div>
         `;
         document.getElementById("action-area").innerHTML = "";
 
-        let adTime = 15;
+        let adTime = 7;
         const interval = setInterval(() => {
             adTime--;
             document.getElementById("ad-timer").innerText = adTime;
@@ -272,7 +411,7 @@
     }
 
     function showResult() {
-        document.getElementById("app-container").classList.remove("ad-screen");
+        playResultSound();
         document.getElementById("question-number").innerText = "RESULT";
         
         let finalResult = currentData.results[currentData.results.length - 1].text;
@@ -284,15 +423,14 @@
         }
 
         const content = document.getElementById("content-area");
-        content.innerHTML = `<div id="main-text">${finalResult}</div>`;
+        content.innerHTML = `<div id="main-text" style="animation: fadeIn 0.5s ease-out;">${finalResult}</div>`;
 
         const area = document.getElementById("action-area");
         area.innerHTML = "";
         
-        // メニューに戻るボタン
         const btnMenu = document.createElement("button");
-        btnMenu.innerText = "トップメニューに戻る";
-        btnMenu.onclick = () => window.location.href = window.location.pathname;
+        btnMenu.innerText = "他の診断も受けてみる";
+        btnMenu.onclick = goHome;
         area.appendChild(btnMenu);
     }
 
