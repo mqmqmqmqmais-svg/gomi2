@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>【極限超越】次元崩壊・超・診断占いシステム</title>
     <style>
-        /* 🎨 限界突破ネオン・次元崩壊変数 */
+        /* 🎨 変数定義 */
         :root {
             --bg-color: #000000;
-            --card-bg: rgba(5, 5, 10, 0.92); /* 透明度を下げて文字を読みやすく */
+            --card-bg: rgba(10, 10, 15, 0.98); /* 不透明度を上げてより文字を読みやすく */
             --accent-color: #a252ff;
             --accent-glow: rgba(162, 82, 255, 0.8);
             --border-color: #5c2ea6;
             --text-color: #ffffff;
             --btn-bg: linear-gradient(180deg, #1f1135 0%, #05020a 100%);
-            --grid-color: rgba(162, 82, 255, 0.15);
             --glitch-color1: #00ffff;
             --glitch-color2: #ff00ff;
         }
@@ -28,8 +27,7 @@
         body {
             background-color: #000;
             color: var(--text-color);
-            /* 読みやすいフォントスタックに変更 */
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
@@ -41,7 +39,7 @@
             perspective: 1000px;
         }
 
-        /* 🌌 Canvas背景（リアルタイムパーティクル演算用） */
+        /* 🌌 Canvas背景（パーティクルは維持） */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -49,11 +47,11 @@
             width: 100vw;
             height: 100vh;
             z-index: -2;
-            opacity: 0.9;
+            opacity: 0.8;
             mix-blend-mode: screen;
         }
 
-        /* 📺 画面端を暗くするヴィネット効果（スキャンラインは廃止してクリアに） */
+        /* 背景の僅かなグラデーション */
         body::after {
             content: "";
             position: fixed;
@@ -63,7 +61,7 @@
             height: 100vh;
             background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.8) 150%);
             pointer-events: none;
-            z-index: 999;
+            z-index: -1;
         }
 
         /* 💡 広告エリア */
@@ -71,7 +69,7 @@
             width: 90%;
             max-width: 450px;
             height: 60px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             border: 2px dashed var(--border-color);
             display: flex;
             justify-content: center;
@@ -81,10 +79,8 @@
             font-weight: 900;
             margin: 15px 0;
             border-radius: 4px;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             z-index: 10;
-            box-shadow: 0 0 15px var(--accent-glow), inset 0 0 10px var(--accent-glow);
-            animation: adFlash 3s infinite alternate;
         }
 
         /* 📱 アプリコンテナ */
@@ -94,48 +90,42 @@
             height: 70vh;
             min-height: 500px;
             background: var(--card-bg);
-            backdrop-filter: blur(8px);
             border-radius: 12px;
-            border: 3px solid var(--border-color);
-            padding: 20px;
+            border: 2px solid var(--border-color);
+            padding: 25px 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             z-index: 10;
-            box-shadow: 0 0 40px var(--accent-glow), inset 0 0 20px rgba(0,0,0,0.8);
-            transform-style: preserve-3d;
-            animation: containerFloat 4s ease-in-out infinite, rgbSplit 5s infinite;
+            /* 強すぎたシャドウと揺れアニメーションを軽減 */
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
-        /* 📊 超光速プログレスバー */
+        /* 📊 プログレスバー */
         #progress-container {
             width: 100%;
             height: 12px;
-            background: #000;
-            border: 2px solid var(--border-color);
+            background: #111;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 10px var(--accent-glow);
         }
         #progress-bar {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, #fff, var(--accent-color));
-            box-shadow: 0 0 20px #fff;
+            background: linear-gradient(90deg, #555, var(--accent-color));
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: progressSpark 0.5s infinite;
         }
 
         #question-number {
             font-size: 1rem;
             color: var(--accent-color);
-            margin-bottom: 10px;
-            letter-spacing: 3px;
-            font-weight: 900;
-            text-shadow: 0 0 10px var(--accent-glow);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            font-weight: bold;
             text-align: center;
         }
 
@@ -147,28 +137,18 @@
             align-items: center;
             text-align: center;
             position: relative;
+            overflow-y: auto;
         }
 
-        /* 💥 メインテキスト（縁取りを強化して圧倒的に読みやすく） */
+        /* 💥 メインテキスト（過剰なシャドウを削除し、純粋に読みやすく） */
         #main-text {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             line-height: 1.6;
-            font-weight: 900;
-            margin-bottom: 20px;
+            font-weight: bold;
             color: #ffffff;
-            /* 背景のパーティクルに負けない強固なドロップシャドウ */
-            text-shadow: 
-                2px 2px 0px #000, 
-                -2px -2px 0px #000, 
-                2px -2px 0px #000, 
-                -2px 2px 0px #000, 
-                0 0 15px var(--accent-color);
-            position: relative;
-            transition: all 0.3s;
-            word-break: keep-all;
-        }
-        .glitch-active {
-            animation: glitchText 0.3s cubic-bezier(.25, .46, .45, .94) both;
+            margin-bottom: 20px;
+            padding: 0 10px;
+            white-space: pre-wrap;
         }
 
         #action-area {
@@ -179,51 +159,30 @@
             padding-bottom: 10px;
         }
 
-        /* ✨ 破壊的立体ボタン */
+        /* ✨ ボタン */
         button, .menu-btn {
             background: var(--btn-bg);
             color: #fff;
-            border: 2px solid var(--border-color);
+            border: 1px solid var(--border-color);
             padding: 18px;
             font-size: 1.1rem;
             cursor: pointer;
             border-radius: 8px;
-            font-weight: 900;
+            font-weight: bold;
             text-decoration: none;
             display: block;
             text-align: center;
             letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 6px 0px calc(var(--border-color) - #222), 0 10px 15px rgba(0,0,0,0.8), 0 0 15px var(--accent-glow);
-            transition: all 0.1s;
-            text-shadow: 1px 1px 2px #000, 0 0 8px #fff;
+            transition: transform 0.1s, background 0.2s;
         }
 
-        button::before, .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: -100%;
-            width: 50%;
-            height: 200%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transform: translateY(-50%) skewX(-45deg);
-            transition: 0.5s;
-        }
-        button:hover::before, .menu-btn:hover::before {
-            left: 200%;
-        }
-
+        /* ボタンのホバー＆アクティブ（フラッシュなし、少し沈むだけ） */
         button:active, .menu-btn:active {
-            transform: translateY(6px) scale(0.98);
-            box-shadow: 0 0px 0px transparent, 0 2px 5px rgba(0,0,0,0.9), 0 0 20px var(--accent-color);
-            background: var(--accent-color);
-            color: #000;
-            text-shadow: none;
+            transform: translateY(3px);
+            background: var(--border-color);
         }
 
-        /* 🌀 広告待機中の異次元エフェクト */
+        /* 🌀 広告待機中のエフェクト */
         .analyzer-container {
             display: flex;
             flex-direction: column;
@@ -233,61 +192,16 @@
             height: 100%;
         }
         .magic-circle {
-            width: 120px;
-            height: 120px;
-            border: 6px dashed var(--accent-color);
+            width: 100px;
+            height: 100px;
+            border: 4px dashed var(--accent-color);
             border-radius: 50%;
             position: relative;
-            animation: spinCircle 2s linear infinite;
-            box-shadow: 0 0 30px var(--accent-glow), inset 0 0 30px var(--accent-glow);
-        }
-        .magic-circle::before {
-            content: '';
-            position: absolute;
-            top: -12px; left: -12px; right: -12px; bottom: -12px;
-            border: 3px solid rgba(255,255,255,0.5);
-            border-radius: 50%;
-            animation: spinCircle 1s linear infinite reverse;
+            animation: spinCircle 3s linear infinite;
         }
 
-        /* 🎬 限界突破アニメーション群（目に優しいレベルに調整） */
-        @keyframes containerFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        @keyframes rgbSplit {
-            0%, 100% { box-shadow: -2px 0 15px var(--glitch-color1), 2px 0 15px var(--glitch-color2), 0 0 30px var(--accent-glow); }
-            50% { box-shadow: 2px 0 15px var(--glitch-color1), -2px 0 15px var(--glitch-color2), 0 0 50px var(--accent-glow); }
-        }
-        @keyframes adFlash {
-            0%, 100% { opacity: 1; border-color: var(--accent-color); }
-            50% { opacity: 0.8; border-color: #fff; text-shadow: 0 0 5px #fff; }
-        }
-        @keyframes progressSpark {
-            0% { filter: brightness(1); }
-            50% { filter: brightness(1.3); }
-            100% { filter: brightness(1); }
-        }
         @keyframes spinCircle {
             100% { transform: rotate(360deg); }
-        }
-        @keyframes glitchText {
-            0% { transform: translate(0); }
-            25% { transform: translate(-2px, 1px); }
-            50% { transform: translate(2px, -1px); }
-            75% { transform: translate(-1px, -1px); }
-            100% { transform: translate(0); }
-        }
-        /* 画面揺れ（フラッシュ色反転を削除し、純粋な微振動のみに） */
-        .screen-shake {
-            animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        @keyframes shake {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(3px, 3px) rotate(0.5deg); }
-            50% { transform: translate(-3px, -3px) rotate(-0.5deg); }
-            75% { transform: translate(-3px, 3px) rotate(0.5deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
         }
     </style>
 </head>
@@ -304,21 +218,20 @@
         </div>
         <div id="question-number">SYSTEM BOOTING...</div>
         <div id="content-area">
-            <div id="main-text">🔮 超次元心理オラクル 🔮<br><span style="font-size:1rem; color:#aaa; text-shadow:none;">運命を破壊する15の質問</span></div>
+            <div id="main-text" style="font-size:1.5rem;">🔮 超次元診断ポータル 🔮<br><span style="font-size:1rem; color:#aaa; font-weight:normal;">テーマを選択してください</span></div>
         </div>
         <div id="action-area">
-            <a href="?id=psycho" class="menu-btn" style="--accent-color:#ff003c; --border-color:#8a0020; --btn-bg:linear-gradient(180deg, #2a000a, #000);" onclick="impactEffect()">☠ 1. サイコパス狂気診断</a>
-            <a href="?id=talent" class="menu-btn" style="--accent-color:#00ff00; --border-color:#008a00; --btn-bg:linear-gradient(180deg, #002a00, #000);" onclick="impactEffect()">⚡ 2. 神殺しの器・才能覚醒診断</a>
-            <a href="?id=future" class="menu-btn" style="--accent-color:#ffaa00; --border-color:#8a5c00; --btn-bg:linear-gradient(180deg, #2a1c00, #000);" onclick="impactEffect()">🌌 3. 来世の業象・時空転生診断</a>
+            <a href="?id=psycho" class="menu-btn" style="--accent-color:#ff003c; --border-color:#8a0020; --btn-bg:linear-gradient(180deg, #2a000a, #000);" onclick="playHeavyClick()">☠ 1. サイコパス狂気診断</a>
+            <a href="?id=talent" class="menu-btn" style="--accent-color:#00ff00; --border-color:#008a00; --btn-bg:linear-gradient(180deg, #002a00, #000);" onclick="playHeavyClick()">⚡ 2. 神殺しの器・才能覚醒診断</a>
+            <a href="?id=future" class="menu-btn" style="--accent-color:#ffaa00; --border-color:#8a5c00; --btn-bg:linear-gradient(180deg, #2a1c00, #000);" onclick="playHeavyClick()">🌌 3. 来世の業象・時空転生診断</a>
         </div>
     </div>
 
     <div class="ad-container" id="bottom-ad">【NEON AD SPACE: BOTTOM】</div>
 
 <script>
-    /* 🎵 Web Audio API */
+    /* 🎵 クリック音のみ（フラッシュ・画面揺れは削除） */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
     function playHeavyClick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const t = audioCtx.currentTime;
@@ -327,53 +240,21 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(100, t);
-        osc.frequency.exponentialRampToValueAtTime(20, t + 0.1);
-        gain.gain.setValueAtTime(0.15, t);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, t);
+        osc.frequency.exponentialRampToValueAtTime(50, t + 0.1); 
+        gain.gain.setValueAtTime(0.1, t);
         gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
         
         osc.start(t);
         osc.stop(t + 0.1);
     }
 
-    function playGlitchSound() {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const bufferSize = audioCtx.sampleRate * 0.1;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-        
-        noise.connect(gain).connect(audioCtx.destination);
-        noise.start();
-    }
-
-    /* 💥 画面振動（フラッシュなし） */
-    function impactEffect() {
-        playHeavyClick();
-        document.body.classList.remove("screen-shake");
-        void document.body.offsetWidth;
-        document.body.classList.add("screen-shake");
-        
-        const txt = document.getElementById("main-text");
-        if(txt) {
-            txt.classList.add("glitch-active");
-            setTimeout(() => txt.classList.remove("glitch-active"), 300);
-        }
-    }
-
-    /* 🌌 Canvasパーティクル演算（全テーマを超強化） */
+    /* 🌌 Canvasパーティクル演算（エフェクトは維持） */
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
-    let particleMode = 'default';
+    let particleMode = 'default'; // default, psycho, talent, future
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -383,79 +264,55 @@
     resizeCanvas();
 
     class Particle {
-        constructor() {
-            this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            
             if(particleMode === 'psycho') {
-                // 狂気の赤：画面中央から爆発的に蠢き、拡散する血とノイズ
-                this.x = canvas.width / 2 + (Math.random() - 0.5) * 100;
-                this.y = canvas.height / 2 + (Math.random() - 0.5) * 100;
+                this.x = canvas.width / 2 + (Math.random() - 0.5) * 20;
+                this.y = canvas.height / 2 + (Math.random() - 0.5) * 20;
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 15 + 2;
+                const speed = Math.random() * 20 + 5;
                 this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed + 2; // 少し下に滴る
-                this.size = Math.random() * 6 + 1;
-                this.color = `rgba(255, ${Math.random()*20}, ${Math.random()*20}, ${Math.random()*0.8 + 0.2})`;
-                this.life = Math.random() * 0.5 + 0.5;
-                
+                this.vy = Math.sin(angle) * speed;
+                this.size = Math.random() * 6 + 2;
+                this.color = `rgba(255, 0, ${Math.random()*40}, ${Math.random()*0.8 + 0.2})`;
             } else if(particleMode === 'talent') {
-                // サイバー降雨：圧倒的スピードで落ちるマトリックスコード
-                this.x = Math.floor(Math.random() * (canvas.width/15)) * 15;
+                this.x = Math.floor(Math.random() * (canvas.width/20)) * 20;
                 this.y = -Math.random() * canvas.height;
                 this.vx = 0;
-                this.vy = Math.random() * 20 + 10; // 超高速
+                this.vy = Math.random() * 30 + 10;
                 this.size = Math.random() * 2 + 1;
-                this.color = `rgba(0, 255, ${Math.random()*150+100}, ${Math.random()*0.8 + 0.2})`;
-                this.char = String.fromCharCode(0x30A0 + Math.random() * 96); // カタカナ・記号
-                
+                this.color = `rgba(0, 255, ${Math.random()*150+100}, 0.9)`;
+                this.char = String.fromCharCode(0x30A0 + Math.random() * 96);
             } else if(particleMode === 'future') {
-                // 宇宙ワープ：放射状に迫りくる星屑
                 this.x = canvas.width / 2;
                 this.y = canvas.height / 2;
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 10 + 3;
+                const speed = Math.random() * 15 + 2;
                 this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
-                this.size = Math.random() * 2 + 0.5;
-                this.color = `rgba(${Math.random()*100+150}, ${Math.random()*100+150}, 255, 0.9)`;
-                
+                this.vy = Math.sin(angle) * speed; 
+                this.size = Math.random() * 3 + 1;
+                this.color = `rgba(255, ${Math.random()*100+150}, 0, 0.8)`;
             } else {
-                this.vx = (Math.random() - 0.5) * 2;
-                this.vy = (Math.random() - 0.5) * 2;
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5);
+                this.vy = (Math.random() - 0.5);
                 this.size = Math.random() * 2;
                 this.color = 'rgba(162, 82, 255, 0.5)';
             }
         }
-        
         update() {
             this.x += this.vx;
             this.y += this.vy;
-            
-            if(particleMode === 'psycho') {
-                this.size *= 0.96; // 飛び散りながら消える
-                if(this.size < 0.5) this.reset();
-            } else if(particleMode === 'future') {
-                this.size *= 1.06; // 迫ってくる
-            }
-            
-            if (this.y > canvas.height || this.y < 0 || this.x > canvas.width || this.x < 0) {
-                this.reset();
-            }
+            if(particleMode === 'future' || particleMode === 'psycho') this.size *= 1.05;
+            if (this.y > canvas.height || this.y < 0 || this.x > canvas.width || this.x < 0) this.reset();
         }
-        
         draw() {
+            ctx.fillStyle = this.color;
             if(particleMode === 'talent') {
-                ctx.fillStyle = this.color;
-                ctx.font = '16px monospace';
+                ctx.font = 'bold 18px monospace';
                 ctx.fillText(this.char, this.x, this.y);
-                // たまに文字が変わるバグ表現
-                if(Math.random() > 0.9) this.char = String.fromCharCode(0x30A0 + Math.random() * 96);
             } else {
-                ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -463,40 +320,33 @@
         }
     }
 
-    // パーティクルの数（過剰演出のため大量配置）
     for (let i = 0; i < 200; i++) particles.push(new Particle());
 
     function animateParticles() {
-        // 残像効果の調整（サイコパスとマトリックスは残像を強くする）
-        if(particleMode === 'talent' || particleMode === 'psycho') {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-        } else {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        }
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
         particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animateParticles);
     }
     animateParticles();
 
-    /* 💡 テーマ別データベース */
+    /* 💡 テーマ別データベース（診断内容を正常化・最適化） */
     const shindanDatabase = {
         psycho: {
             title: "☠ サイコパス狂気診断",
             mode: "psycho",
             theme: { bg: "#0a0000", card: "rgba(20, 0, 0, 0.95)", accent: "#ff003c", glow: "rgba(255, 0, 60, 0.8)", border: "#8a0020", btn: "linear-gradient(180deg, #3a000d, #000)" },
             questions: [
-                { text: "他人の不幸なニュースを見ると、顔の筋肉が微かに緩む？", score: 2 },
-                { text: "目的のためなら、親しい人間も単なる「リソース（資源）」として計算できる？", score: 3 },
-                { text: "ルールは絶対ではなく、自分が捕まらないためのガイドラインに過ぎない？", score: 2 },
-                { text: "恐怖やパニックに陥った人間の顔を観察するのが好きだ？", score: 3 },
-                { text: "他人に共感しているフリをするのは、もはや息を吸うより簡単だ？", score: 3 }
+                { text: "他人が悲しんでいたり、泣いているのを見ても、あまり何も感じない。", score: 3 },
+                { text: "自分の目的を達成するためなら、多少嘘をついたり人を騙しても構わないと思う。", score: 3 },
+                { text: "カッとなると、後先考えずに衝動的な行動をとってしまうことが多い。", score: 2 },
+                { text: "自分は他の人よりも特別で、優れている人間だと心の底で思っている。", score: 2 },
+                { text: "悪いことをしても、「仕方なかった」「自分のせいではない」と言い訳を見つけるのが得意だ。", score: 3 }
             ],
             results: [
-                { maxScore: 5, text: "【観測者：一般人】\nあなたの精神は極めて正常です。狂気の世界に踏み入るには優しすぎます。" },
-                { maxScore: 10, text: "【潜伏者：仮面の異常者】\nあなたは社会に溶け込んでいますが、確実に「黒い衝動」を隠し持っています。" },
-                { maxScore: 99, text: "【超越者：純粋悪の顕現】\nあなたの本質は完全なサイコパスです。感情という無駄な機能を排除した、恐るべき合理主義の化身です。" }
+                { maxScore: 5, text: "【サイコパス度：低（0〜30%）】\nあなたはごく一般的な良識と共感性を持った人です。他人の痛みがわかり、ルールを守ろうとする正常な感覚を持っています。安心して社会生活を送ってください。" },
+                { maxScore: 10, text: "【サイコパス度：中（40〜70%）】\n少し自己中心的な面があるようです。合理的な判断が得意な反面、冷たい印象を持たれることがあるかもしれません。時と場合によってはサイコパス的な思考を活用できるタイプです。" },
+                { maxScore: 99, text: "【サイコパス度：高（80%〜）】\nサイコパス傾向が非常に高いです。他者への共感が乏しく、目的のためなら手段を選ばない冷徹さを持っています。その合理性を活かせる場所を見つければ大成するかもしれません。" }
             ]
         },
         talent: {
@@ -504,33 +354,33 @@
             mode: "talent",
             theme: { bg: "#000a05", card: "rgba(0, 20, 10, 0.95)", accent: "#00ffaa", glow: "rgba(0, 255, 170, 0.8)", border: "#008a4c", btn: "linear-gradient(180deg, #003a20, #000)" },
             questions: [
-                { text: "世界がすべてコード（数値）の羅列に見える瞬間がある？", score: 3 },
-                { text: "他人の行動パターンを瞬時に解析し、次の言葉を先読みできる？", score: 2 },
-                { text: "一つの物事に没頭すると、食事や睡眠という概念すら忘却する？", score: 2 },
-                { text: "既存のシステムを破壊し、ゼロから組み直したい衝動に駆られる？", score: 3 },
-                { text: "直感よりもデータ、感情よりも確率を絶対の神として信奉している？", score: 3 }
+                { text: "既存のルールやマニュアルに従うよりも、自分で全く新しいやり方を考える方が好きだ。", score: 3 },
+                { text: "興味を持ったことには、寝食を忘れるほど異常な集中力を発揮する。", score: 2 },
+                { text: "周りの人が「常識だ」と言っていることに対して、「本当にそうか？」と疑問を持つことが多い。", score: 3 },
+                { text: "感情論で話されるのが苦手で、常に論理的・合理的な解決策を求めてしまう。", score: 2 },
+                { text: "誰も思いつかないような突飛なアイデアをひらめく瞬間がよくある。", score: 3 }
             ],
             results: [
-                { maxScore: 5, text: "【歯車：適応型ワーカー】\nあなたは社会システムを支える優秀な歯車です。平穏な日常が約束されています。" },
-                { maxScore: 10, text: "【異端児：バグの発生源】\n既存の枠組みを壊す可能性を秘めています。クリエイターや革命家の素質あり。" },
-                { maxScore: 99, text: "【アーキテクト：新世界の創造主】\n神をも凌駕する演算能力。世界を支配し、再構築するための圧倒的な裏才能が覚醒しています。" }
+                { maxScore: 5, text: "【適応型タレント：協調性の才能】\nあなたの才能は「和を尊ぶ」ことにあります。組織の中でうまく立ち回り、チームを円滑に進めるバランス感覚に優れています。突飛な才能よりも、堅実な努力で成功するタイプです。" },
+                { maxScore: 10, text: "【開拓型タレント：アイデアの才能】\n一般的な常識に囚われない、柔軟な発想力を持っています。新しい企画を立ち上げたり、問題を別の角度から解決するクリエイターとしての才能が眠っているようです。" },
+                { maxScore: 99, text: "【革命型タレント：破壊と創造の才能】\n既存のシステムを根本から覆す、天才的な（あるいは異端な）才能を秘めています。常識にとらわれず、ゼロからイチを生み出す圧倒的な熱量とビジョンを持つイノベーター気質です。" }
             ]
         },
         future: {
             title: "🌌 来世の業象・時空転生診断",
             mode: "future",
-            theme: { bg: "#050010", card: "rgba(10, 0, 25, 0.95)", accent: "#ffaa00", glow: "rgba(255, 170, 0, 0.8)", border: "#8a00cc", btn: "linear-gradient(180deg, #3a0066, #000)" },
+            theme: { bg: "#050010", card: "rgba(10, 0, 20, 0.95)", accent: "#ffaa00", glow: "rgba(255, 170, 0, 0.8)", border: "#8a00cc", btn: "linear-gradient(180deg, #3a0066, #000)" },
             questions: [
-                { text: "夜空の星を見上げると、そこが自分の「本当の帰る場所」だと感じる？", score: 3 },
-                { text: "今の地球の文明レベルは、あまりにも低俗で退屈に思える？", score: 2 },
-                { text: "夢の中で、重力に逆らって宇宙空間を浮遊した記憶がある？", score: 3 },
-                { text: "機械文明より、魔術や精神感応（テレパシー）の世界に惹かれる？", score: 2 },
-                { text: "肉体という「器」は不便であり、純粋なエネルギー体になりたい？", score: 3 }
+                { text: "自然や動物と触れ合っていると、人間関係の悩みなどどうでもよくなる。", score: 2 },
+                { text: "時々、今の自分が生きているこの時代や場所に「違和感」を覚えることがある。", score: 3 },
+                { text: "争いごとや競争社会には疲れ果てており、とにかく穏やかに過ごしたい。", score: 2 },
+                { text: "人間という生き物の複雑な感情やしがらみが、ひどく面倒だと感じる。", score: 3 },
+                { text: "星空や宇宙の映像を見ていると、なぜか懐かしい気持ちになる。", score: 3 }
             ],
             results: [
-                { maxScore: 5, text: "【地球再演：人間（ループ）】\nあなたの魂はまだ地球に未練があります。来世もまた、人間としてドラマを演じるでしょう。" },
-                { maxScore: 10, text: "【異界放浪：エルフの賢者】\n地球を卒業し、魔法と自然が調和する高次元の異世界で、悠久の時を生きる賢者に転生します。" },
-                { maxScore: 99, text: "【神格化：次元喰いの星霊】\n肉体を捨て、星を喰らい宇宙を創造する概念的存在（神）へ至ります。この宇宙はあなたの箱庭となります。" }
+                { maxScore: 5, text: "【来世の姿：人間への再転生】\nあなたの魂は、まだ人間社会での学びやドラマにやり残したことがあるようです。来世でも再び人間として生まれ、より豊かな人生の経験を積んでいくことになるでしょう。" },
+                { maxScore: 10, text: "【来世の姿：自然界の精霊・動物】\n人間の複雑な感情や社会構造に少し疲れているようです。来世はしがらみのない、自由な動物や、自然と調和する存在に転生し、穏やかで平和な時を過ごすでしょう。" },
+                { maxScore: 99, text: "【来世の姿：宇宙の星々・エネルギー体】\nあなたの魂は地球という枠組みを卒業する段階に来ています。来世では肉体を持たず、宇宙を漂う星や、純粋なエネルギー体として高次元の世界を旅することになるでしょう。" }
             ]
         }
     };
@@ -556,14 +406,13 @@
         applyTheme(currentData.theme);
         document.title = currentData.title;
         document.getElementById("progress-container").style.display = "block";
-        document.getElementById("action-area").innerHTML = `<button onclick="startQuestion()">⚡ 精神をリンクする ⚡</button>`;
+        document.getElementById("action-area").innerHTML = `<button onclick="startQuestion()">診断を開始する</button>`;
         document.getElementById("main-text").innerText = currentData.title;
-        document.getElementById("question-number").innerText = "DIMENSION SYNC READY";
+        document.getElementById("question-number").innerText = "READY";
     }
 
     function startQuestion() {
-        impactEffect();
-        playGlitchSound();
+        playHeavyClick();
         loadQuestion();
     }
 
@@ -572,19 +421,18 @@
         
         const prog = (currentIdx / currentData.questions.length) * 100;
         document.getElementById("progress-bar").style.width = prog + "%";
-        document.getElementById("question-number").innerText = `SCANNING MEMORY: ${currentIdx + 1} / ${currentData.questions.length}`;
+        document.getElementById("question-number").innerText = `QUESTION: ${currentIdx + 1} / ${currentData.questions.length}`;
         document.getElementById("main-text").innerText = currentData.questions[currentIdx].text;
         
         const area = document.getElementById("action-area");
         area.innerHTML = `
-            <button onclick="answer(true)">[ YES / 肯定 ]</button>
-            <button onclick="answer(false)">[ NO / 否定 ]</button>
+            <button onclick="answer(true)">はい / YES</button>
+            <button onclick="answer(false)">いいえ / NO</button>
         `;
     }
 
     function answer(isYes) {
-        impactEffect();
-        if(Math.random() > 0.7) playGlitchSound();
+        playHeavyClick();
         if(isYes) totalScore += currentData.questions[currentIdx].score;
         currentIdx++;
         loadQuestion();
@@ -592,13 +440,13 @@
 
     function showAdScreen() {
         document.getElementById("progress-bar").style.width = "100%";
-        document.getElementById("question-number").innerText = "⚠️ SYSTEM OVERLOAD ⚠️";
+        document.getElementById("question-number").innerText = "ANALYZING...";
         
         document.getElementById("content-area").innerHTML = `
             <div class="analyzer-container">
                 <div class="magic-circle"></div>
-                <div id="main-text" style="margin-top:20px; font-size:1.2rem;">高次元演算中...因果律を書き換えています</div>
-                <div id="ad-timer" style="font-size:3rem; color:var(--accent-color); font-weight:900;">5</div>
+                <div id="main-text" style="margin-top:20px; font-size:1.1rem; color:#ccc;">結果を解析中...</div>
+                <div id="ad-timer" style="font-size:2rem; color:var(--accent-color); font-weight:bold;">5</div>
             </div>
         `;
         document.getElementById("action-area").innerHTML = "";
@@ -606,22 +454,19 @@
         let t = 5;
         const intv = setInterval(() => {
             t--;
-            impactEffect();
             document.getElementById("ad-timer").innerText = t;
             if (t <= 0) { clearInterval(intv); showResult(); }
         }, 1000);
     }
 
     function showResult() {
-        impactEffect();
         playHeavyClick();
-        setTimeout(playGlitchSound, 200);
         
-        document.getElementById("question-number").innerText = "FINAL RESULT";
+        document.getElementById("question-number").innerText = "RESULT";
         let res = currentData.results.find(r => totalScore <= r.maxScore) || currentData.results[currentData.results.length-1];
         
-        document.getElementById("content-area").innerHTML = `<div id="main-text" style="font-size:1.3rem; text-align:left; padding:10px;">${res.text}</div>`;
-        document.getElementById("action-area").innerHTML = `<a href="${window.location.pathname}" class="menu-btn" onclick="impactEffect()">🔙 転生ポータルへ帰還</a>`;
+        document.getElementById("content-area").innerHTML = `<div id="main-text" style="font-size:1.2rem; text-align:left; padding:10px;">${res.text}</div>`;
+        document.getElementById("action-area").innerHTML = `<a href="${window.location.pathname}" class="menu-btn" onclick="playHeavyClick()">トップに戻る</a>`;
     }
 </script>
 
