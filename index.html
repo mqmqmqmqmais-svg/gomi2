@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="全15問・約3分でわかる本格心理診断。サイコパス度、才能、恋愛依存度、メンタル強度などを論理的に分析します。">
     <title>【極限超越】次元崩壊・超・診断占いシステム</title>
     <style>
         :root {
@@ -20,7 +21,7 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
-        
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -34,7 +35,30 @@
             min-height: 100vh;
             overflow: hidden;
             perspective: 1000px;
-            transition: background-color 0.5s ease;
+            transition: background-color 0.6s ease;
+            position: relative;
+        }
+
+        /* 背景の淡いネビュラ（テーマカラーで自動追従） */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 160vmax;
+            height: 160vmax;
+            transform: translate(-50%, -50%);
+            background: conic-gradient(from 0deg, var(--accent-glow), transparent 20%, transparent 80%, var(--accent-glow));
+            opacity: 0.12;
+            mix-blend-mode: screen;
+            pointer-events: none;
+            z-index: -3;
+            animation: nebulaSpin 50s linear infinite;
+            transition: background 0.6s ease;
+        }
+
+        @keyframes nebulaSpin {
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         #bg-canvas {
@@ -44,7 +68,7 @@
             width: 100vw;
             height: 100vh;
             z-index: -2;
-            opacity: 0.8;
+            opacity: 0.85;
             mix-blend-mode: screen;
         }
 
@@ -64,13 +88,13 @@
             width: 90%;
             max-width: 450px;
             height: 60px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 2px dashed var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
             display: flex;
             justify-content: center;
             align-items: center;
-            color: var(--accent-color);
-            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 0.7rem;
             font-weight: bold;
             margin: 15px 0;
             border-radius: 4px;
@@ -82,17 +106,44 @@
             width: 95%;
             max-width: 450px;
             height: 70vh;
-            min-height: 520px;
+            min-height: 540px;
             background: var(--card-bg);
-            border-radius: 12px;
-            border: 2px solid var(--border-color);
-            padding: 25px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            padding: 28px 22px 22px;
             position: relative;
             z-index: 10;
-            box-shadow: 0 0 20px var(--accent-glow);
-            transition: all 0.5s ease;
+            box-shadow: 0 0 25px var(--accent-glow), inset 0 0 40px rgba(0,0,0,0.5);
+            transition: box-shadow 0.6s ease, border-color 0.6s ease;
             display: flex;
             flex-direction: column;
+            animation: cardRise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes cardRise {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* HUD風コーナー装飾（署名要素） */
+        .hud-corner {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: var(--accent-color);
+            opacity: 0.9;
+            filter: drop-shadow(0 0 4px var(--accent-glow));
+            transition: border-color 0.6s ease;
+            animation: hudPulse 3s ease-in-out infinite;
+        }
+        .hud-corner.tl { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; border-top-left-radius: 6px; }
+        .hud-corner.tr { top: -1px; right: -1px; border-top: 2px solid; border-right: 2px solid; border-top-right-radius: 6px; }
+        .hud-corner.bl { bottom: -1px; left: -1px; border-bottom: 2px solid; border-left: 2px solid; border-bottom-left-radius: 6px; }
+        .hud-corner.br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; border-bottom-right-radius: 6px; }
+
+        @keyframes hudPulse {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 1; }
         }
 
         .screen {
@@ -107,11 +158,11 @@
 
         #progress-container {
             width: 100%;
-            height: 12px;
+            height: 14px;
             background: #111;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            margin-bottom: 15px;
+            border-radius: 7px;
+            margin-bottom: 16px;
             position: relative;
             overflow: hidden;
         }
@@ -119,16 +170,41 @@
             width: 0%;
             height: 100%;
             background: linear-gradient(90deg, #555, var(--accent-color));
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        /* 15問分の目盛り（固定仕様） */
+        #progress-container::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: repeating-linear-gradient(
+                to right,
+                transparent 0,
+                transparent calc(100%/15 - 2px),
+                rgba(0,0,0,0.5) calc(100%/15 - 2px),
+                rgba(0,0,0,0.5) calc(100%/15)
+            );
+        }
+        #progress-label {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #999;
+            letter-spacing: 1px;
+            margin-top: -12px;
+            margin-bottom: 14px;
         }
 
         .header-title {
             font-size: 1rem;
             color: var(--accent-color);
             margin-bottom: 15px;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             font-weight: bold;
             text-align: center;
+            transition: color 0.6s ease;
         }
 
         .content-area {
@@ -144,11 +220,11 @@
 
         .main-text {
             font-size: 1.2rem;
-            line-height: 1.6;
+            line-height: 1.7;
             font-weight: bold;
             color: #ffffff;
             margin-bottom: 20px;
-            padding: 0 10px;
+            padding: 0 6px;
             white-space: pre-wrap;
         }
 
@@ -157,7 +233,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            padding-bottom: 10px;
+            padding-bottom: 6px;
         }
 
         button, .menu-btn {
@@ -165,7 +241,7 @@
             color: #fff;
             border: 1px solid var(--border-color);
             padding: 16px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             cursor: pointer;
             border-radius: 8px;
             font-weight: bold;
@@ -173,13 +249,55 @@
             display: block;
             text-align: center;
             letter-spacing: 1px;
-            transition: transform 0.1s, background 0.2s;
+            transition: transform 0.12s ease, box-shadow 0.25s ease, background 0.2s ease;
             width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover, .menu-btn:hover {
+            box-shadow: 0 0 14px var(--accent-glow);
         }
 
         button:active, .menu-btn:active {
-            transform: translateY(3px);
+            transform: translateY(3px) scale(0.99);
             background: var(--border-color);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            transform: scale(0);
+            animation: rippleAnim 0.55s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            to { transform: scale(3.2); opacity: 0; }
+        }
+
+        .menu-sub {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: normal;
+            opacity: 0.65;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        .action-area .menu-btn {
+            opacity: 0;
+            animation: menuIn 0.5s ease forwards;
+        }
+        .action-area .menu-btn:nth-child(1) { animation-delay: 0.05s; }
+        .action-area .menu-btn:nth-child(2) { animation-delay: 0.12s; }
+        .action-area .menu-btn:nth-child(3) { animation-delay: 0.19s; }
+        .action-area .menu-btn:nth-child(4) { animation-delay: 0.26s; }
+        .action-area .menu-btn:nth-child(5) { animation-delay: 0.33s; }
+
+        @keyframes menuIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .home-btn {
@@ -191,6 +309,7 @@
             margin-top: 10px;
         }
 
+        /* 診断中（アナライザー）画面 */
         .analyzer-container {
             display: flex;
             flex-direction: column;
@@ -199,38 +318,93 @@
             width: 100%;
             height: 100%;
         }
-        .magic-circle {
-            width: 100px;
-            height: 100px;
-            border: 4px dashed var(--accent-color);
-            border-radius: 50%;
+        .rings {
             position: relative;
-            animation: spinCircle 3s linear infinite;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border-style: dashed;
+        }
+        .ring.r1 { width: 120px; height: 120px; border-width: 3px; border-color: var(--accent-color); animation: spinCircle 3.5s linear infinite; }
+        .ring.r2 { width: 90px; height: 90px; border-width: 2px; border-color: var(--border-color); animation: spinCircleRev 2.6s linear infinite; }
+        .ring.r3 { width: 60px; height: 60px; border-width: 1px; border-color: var(--accent-color); opacity: 0.6; animation: spinCircle 1.8s linear infinite; }
+        .ring-symbol {
+            font-size: 1.6rem;
+            filter: drop-shadow(0 0 6px var(--accent-glow));
+            animation: symbolPulse 1.4s ease-in-out infinite;
         }
 
-        @keyframes spinCircle {
-            100% { transform: rotate(360deg); }
+        @keyframes spinCircle { 100% { transform: rotate(360deg); } }
+        @keyframes spinCircleRev { 100% { transform: rotate(-360deg); } }
+        @keyframes symbolPulse {
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            50% { transform: scale(1.15); opacity: 1; }
+        }
+
+        /* 結果画面のゲージ */
+        .gauge-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 6px;
+        }
+        .gauge-fill {
+            transition: stroke-dashoffset 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .result-label {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+        .divider {
+            width: 60%;
+            border: none;
+            border-top: 1px dashed var(--border-color);
+            margin: 12px auto 16px;
+            opacity: 0.7;
+        }
+        .result-text {
+            text-align: left;
+            font-size: 1.05rem;
+            line-height: 1.75;
+            padding: 0 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body::before, .hud-corner, .ring, .ring-symbol, .action-area .menu-btn, #app-container {
+                animation: none !important;
+            }
         }
     </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
-    <div class="ad-container">【NEON AD SPACE: TOP】</div>
+    <div class="ad-container">AD SPACE</div>
 
     <div id="app-container">
-        
+        <div class="hud-corner tl"></div>
+        <div class="hud-corner tr"></div>
+        <div class="hud-corner bl"></div>
+        <div class="hud-corner br"></div>
+
         <div id="screen-menu" class="screen active">
-            <div class="header-title">SYSTEM BOOTING...</div>
+            <div class="header-title" id="boot-title">SYSTEM BOOTING...</div>
             <div class="content-area">
                 <div class="main-text" style="font-size:1.4rem;">🔮 超次元診断ポータル 🔮<br><span style="font-size:1rem; color:#aaa; font-weight:normal;">テーマを選択してください</span></div>
             </div>
             <div class="action-area">
-                <button class="menu-btn" style="--accent-color:#ff003c; --border-color:#8a0020; --btn-bg:linear-gradient(180deg, #2a000a, #000);" onclick="startDiagnosis('psycho')">☠ 1. サイコパス狂気診断</button>
-                <button class="menu-btn" style="--accent-color:#00ff00; --border-color:#008a00; --btn-bg:linear-gradient(180deg, #002a00, #000);" onclick="startDiagnosis('talent')">⚡ 2. 神殺しの器・才能覚醒診断</button>
-                <button class="menu-btn" style="--accent-color:#ffaa00; --border-color:#8a5c00; --btn-bg:linear-gradient(180deg, #2a1c00, #000);" onclick="startDiagnosis('future')">🌌 3. 来世の業象・時空転生診断</button>
-                <button class="menu-btn" style="--accent-color:#ff0088; --border-color:#a6005c; --btn-bg:linear-gradient(180deg, #33001a, #000);" onclick="startDiagnosis('romance')">💖 4. 狂愛の果て・恋愛依存度診断</button>
-                <button class="menu-btn" style="--accent-color:#00e5ff; --border-color:#0082a6; --btn-bg:linear-gradient(180deg, #002233, #000);" onclick="startDiagnosis('mental')">🌊 5. 奈落の底・メンタル強度診断</button>
+                <button class="menu-btn" style="--accent-color:#ff003c; --border-color:#8a0020; --btn-bg:linear-gradient(180deg, #2a000a, #000);" onclick="startDiagnosis('psycho')">☠ サイコパス狂気診断<span class="menu-sub">全15問・共感性と衝動性の傾向を分析</span></button>
+                <button class="menu-btn" style="--accent-color:#00ff00; --border-color:#008a00; --btn-bg:linear-gradient(180deg, #002a00, #000);" onclick="startDiagnosis('talent')">⚡ 神殺しの器・才能覚醒診断<span class="menu-sub">全15問・思考特性から才能タイプを分析</span></button>
+                <button class="menu-btn" style="--accent-color:#ffaa00; --border-color:#8a5c00; --btn-bg:linear-gradient(180deg, #2a1c00, #000);" onclick="startDiagnosis('future')">🌌 来世の業象・時空転生診断<span class="menu-sub">全15問・価値観と気質のタイプ分析</span></button>
+                <button class="menu-btn" style="--accent-color:#ff0088; --border-color:#a6005c; --btn-bg:linear-gradient(180deg, #33001a, #000);" onclick="startDiagnosis('romance')">💖 狂愛の果て・恋愛依存度診断<span class="menu-sub">全15問・恋愛における依存傾向を分析</span></button>
+                <button class="menu-btn" style="--accent-color:#00e5ff; --border-color:#0082a6; --btn-bg:linear-gradient(180deg, #002233, #000);" onclick="startDiagnosis('mental')">🌊 奈落の底・メンタル強度診断<span class="menu-sub">全15問・ストレス耐性の傾向を分析</span></button>
             </div>
         </div>
 
@@ -238,8 +412,9 @@
             <div id="progress-container">
                 <div id="progress-bar"></div>
             </div>
+            <div id="progress-label"></div>
             <div class="header-title" id="quiz-header">READY</div>
-            
+
             <div class="content-area" id="quiz-content">
             </div>
             <div class="action-area" id="quiz-action">
@@ -248,11 +423,11 @@
 
     </div>
 
-    <div class="ad-container">【NEON AD SPACE: BOTTOM】</div>
+    <div class="ad-container">AD SPACE</div>
 
 <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
+
     function playHeavyClick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const t = audioCtx.currentTime;
@@ -260,13 +435,13 @@
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        
+
         osc.type = 'sine';
         osc.frequency.setValueAtTime(300, t);
         osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
-        gain.gain.setValueAtTime(0.03, t); // クリック音も微調整
+        gain.gain.setValueAtTime(0.03, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-        
+
         osc.start(t);
         osc.stop(t + 0.1);
     }
@@ -285,19 +460,18 @@
         stopBGM();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const t = audioCtx.currentTime;
-        
+
         const masterGain = audioCtx.createGain();
         masterGain.gain.setValueAtTime(0, t);
-        
-        // 5(mental)の重低音は0.02を維持、それ以外(1〜4)は70%カットして0.006に設定
+
         let targetVolume = 0.02;
         if (mode !== 'mental') {
             targetVolume = 0.006;
         }
-        
-        masterGain.gain.linearRampToValueAtTime(targetVolume, t + 2); 
+
+        masterGain.gain.linearRampToValueAtTime(targetVolume, t + 2);
         masterGain.connect(audioCtx.destination);
-        
+
         bgmNodes.push({
             stop: () => {
                 const now = audioCtx.currentTime;
@@ -318,20 +492,20 @@
 
         if (mode === 'psycho') {
             const osc1 = addOsc('sawtooth', 55);
-            const osc2 = addOsc('sawtooth', 56.5); 
+            const osc2 = addOsc('sawtooth', 56.5);
             osc1.connect(masterGain);
             osc2.connect(masterGain);
         } else if (mode === 'talent') {
             const osc = addOsc('square', 110);
-            const lfo = addOsc('square', 12); 
+            const lfo = addOsc('square', 12);
             const tremolo = audioCtx.createGain();
             lfo.connect(tremolo.gain);
             osc.connect(tremolo);
             tremolo.connect(masterGain);
         } else if (mode === 'future') {
             const osc1 = addOsc('sine', 220);
-            const osc2 = addOsc('sine', 329.63); 
-            const lfo = addOsc('sine', 0.2); 
+            const osc2 = addOsc('sine', 329.63);
+            const lfo = addOsc('sine', 0.2);
             const tremolo = audioCtx.createGain();
             lfo.connect(tremolo.gain);
             osc1.connect(tremolo);
@@ -339,11 +513,10 @@
             tremolo.connect(masterGain);
         } else if (mode === 'romance') {
             const osc1 = addOsc('triangle', 440);
-            const osc2 = addOsc('triangle', 466.16); 
+            const osc2 = addOsc('triangle', 466.16);
             osc1.connect(masterGain);
             osc2.connect(masterGain);
-            
-            // 心音ループの音量も70%カット (0.15 -> 0.045)
+
             const interval = setInterval(() => {
                 if (audioCtx.state === 'suspended') return;
                 const time = audioCtx.currentTime;
@@ -352,7 +525,7 @@
                 kick.type = 'sine';
                 kick.frequency.setValueAtTime(150, time);
                 kick.frequency.exponentialRampToValueAtTime(10, time + 0.4);
-                kickGain.gain.setValueAtTime(0.045, time); 
+                kickGain.gain.setValueAtTime(0.045, time);
                 kickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.4);
                 kick.connect(kickGain);
                 kickGain.connect(masterGain);
@@ -361,7 +534,7 @@
             }, 1000);
             bgmIntervals.push(interval);
         } else if (mode === 'mental') {
-            const osc = addOsc('sine', 40); 
+            const osc = addOsc('sine', 40);
             const lfo = addOsc('sine', 0.3);
             const modGain = audioCtx.createGain();
             modGain.gain.value = 5;
@@ -374,7 +547,8 @@
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
-    let particleMode = 'default'; 
+    let particleMode = 'default';
+    let themeGlowColor = 'rgba(162, 82, 255, 0.9)';
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -382,6 +556,7 @@
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
+
     class Particle {
         constructor() { this.reset(); }
         reset() {
@@ -401,6 +576,7 @@
                 this.size = Math.random() * 2 + 1;
                 this.color = `rgba(0, 255, ${Math.random()*150+100}, 0.9)`;
                 this.char = String.fromCharCode(0x30A0 + Math.random() * 96);
+                this.flip = Math.random() * 500;
             } else if(particleMode === 'future') {
                 this.x = canvas.width / 2;
                 this.y = canvas.height / 2;
@@ -410,6 +586,7 @@
                 this.vy = Math.sin(angle) * speed;
                 this.size = Math.random() * 2 + 1;
                 this.color = `rgba(255, ${Math.random()*100+150}, 0, 0.8)`;
+                this.twinkle = Math.random() * Math.PI * 2;
             } else if(particleMode === 'romance') {
                 this.angle = Math.random() * Math.PI * 2;
                 this.radius = Math.random() * canvas.width;
@@ -437,36 +614,58 @@
             if(particleMode === 'psycho') {
                 this.x += this.vx;
                 if (this.x > canvas.width + this.width || this.x < -this.width) this.reset();
+            } else if(particleMode === 'talent') {
+                this.y += this.vy;
+                if (Math.random() < 0.02) this.char = String.fromCharCode(0x30A0 + Math.random() * 96);
+                if (this.y > canvas.height + 20) this.reset();
+            } else if(particleMode === 'future') {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.size *= 1.05;
+                this.twinkle += 0.15;
+                if (this.y > canvas.height || this.y < 0 || this.x > canvas.width || this.x < 0) this.reset();
             } else if(particleMode === 'romance') {
                 this.angle += this.speed;
-                this.radius -= 2; 
+                this.radius -= 2;
                 this.x = canvas.width / 2 + Math.cos(this.angle) * this.radius;
                 this.y -= 1;
                 if (this.radius < 10 || this.y < 0) this.reset();
             } else if(particleMode === 'mental') {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.x += Math.sin(this.y * 0.05); 
+                this.x += Math.sin(this.y * 0.05);
                 if (this.y < -20) this.reset();
             } else {
                 this.x += this.vx;
                 this.y += this.vy;
-                if(particleMode === 'future') this.size *= 1.05; 
                 if (this.y > canvas.height || this.y < 0 || this.x > canvas.width || this.x < 0) this.reset();
             }
         }
         draw() {
             ctx.fillStyle = this.color;
+            ctx.shadowColor = themeGlowColor;
             if(particleMode === 'talent') {
+                ctx.shadowBlur = 6;
                 ctx.font = 'bold 18px monospace';
                 ctx.fillText(this.char, this.x, this.y);
             } else if(particleMode === 'psycho') {
+                ctx.shadowBlur = 4;
                 ctx.fillRect(this.x, this.y, this.width, this.height);
+            } else if(particleMode === 'future') {
+                ctx.shadowBlur = 8;
+                const tw = 0.6 + Math.sin(this.twinkle) * 0.4;
+                ctx.globalAlpha = Math.max(0, Math.min(1, tw));
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
             } else {
+                ctx.shadowBlur = 5;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
             }
+            ctx.shadowBlur = 0;
         }
     }
 
@@ -479,9 +678,40 @@
     }
     animateParticles();
 
+    // ===== ボタン共通のリップル演出 =====
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('button, .menu-btn');
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height);
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+    });
+
+    // ===== 起動タイプライター演出（初回のみ） =====
+    (function bootSequence() {
+        const el = document.getElementById('boot-title');
+        const full = "SYSTEM BOOTING...";
+        let i = 0;
+        el.textContent = "";
+        const iv = setInterval(() => {
+            i++;
+            el.textContent = full.slice(0, i);
+            if (i >= full.length) {
+                clearInterval(iv);
+                setTimeout(() => { el.textContent = "READY // テーマを選択"; }, 500);
+            }
+        }, 60);
+    })();
+
     const shindanDatabase = {
         psycho: {
-            title: "☠ サイコパス狂気診断", mode: "psycho",
+            title: "☠ サイコパス狂気診断", mode: "psycho", symbol: "☠",
             theme: { bg: "#0a0000", card: "rgba(20, 0, 0, 0.95)", accent: "#ff003c", glow: "rgba(255, 0, 60, 0.8)", border: "#8a0020", btn: "linear-gradient(180deg, #3a000d, #000)" },
             questions: [
                 { text: "他人が悲しんでいたり、泣いているのを見ても、あまり何も感じない。", score: 3 },
@@ -507,7 +737,7 @@
             ]
         },
         talent: {
-            title: "⚡ 神殺しの器・才能覚醒診断", mode: "talent",
+            title: "⚡ 神殺しの器・才能覚醒診断", mode: "talent", symbol: "⚡",
             theme: { bg: "#000a05", card: "rgba(0, 20, 10, 0.95)", accent: "#00ffaa", glow: "rgba(0, 255, 170, 0.8)", border: "#008a4c", btn: "linear-gradient(180deg, #003a20, #000)" },
             questions: [
                 { text: "既存のルールやマニュアルに従うよりも、自分で全く新しいやり方を考える方が好きだ。", score: 3 },
@@ -533,7 +763,7 @@
             ]
         },
         future: {
-            title: "🌌 来世の業象・時空転生診断", mode: "future",
+            title: "🌌 来世の業象・時空転生診断", mode: "future", symbol: "🌌",
             theme: { bg: "#050010", card: "rgba(10, 0, 20, 0.95)", accent: "#ffaa00", glow: "rgba(255, 170, 0, 0.8)", border: "#8a00cc", btn: "linear-gradient(180deg, #3a0066, #000)" },
             questions: [
                 { text: "自然や動物と触れ合っていると、人間関係の悩みなどどうでもよくなる。", score: 2 },
@@ -559,7 +789,7 @@
             ]
         },
         romance: {
-            title: "💖 狂愛の果て・恋愛依存度診断", mode: "romance",
+            title: "💖 狂愛の果て・恋愛依存度診断", mode: "romance", symbol: "💖",
             theme: { bg: "#10000a", card: "rgba(20, 0, 15, 0.95)", accent: "#ff0088", glow: "rgba(255, 0, 136, 0.8)", border: "#a6005c", btn: "linear-gradient(180deg, #33001a, #000)" },
             questions: [
                 { text: "恋人からのLINEの返信が1時間無いだけで、何かあったのではと不安になる。", score: 3 },
@@ -585,7 +815,7 @@
             ]
         },
         mental: {
-            title: "🌊 奈落の底・メンタル強度診断", mode: "mental",
+            title: "🌊 奈落の底・メンタル強度診断", mode: "mental", symbol: "🌊",
             theme: { bg: "#000510", card: "rgba(0, 10, 20, 0.95)", accent: "#00e5ff", glow: "rgba(0, 229, 255, 0.8)", border: "#0082a6", btn: "linear-gradient(180deg, #002233, #000)" },
             questions: [
                 { text: "他人から軽く注意されただけで、一日中そのことを引きずってしまう。", score: 3 },
@@ -624,6 +854,7 @@
         r.style.setProperty('--border-color', t.border);
         r.style.setProperty('--btn-bg', t.btn);
         particleMode = mode;
+        themeGlowColor = t.glow;
         particles.forEach(p => p.reset());
     }
 
@@ -634,7 +865,7 @@
 
     function goHome() {
         playHeavyClick();
-        stopBGM(); 
+        stopBGM();
         applyTheme(defaultTheme, 'default');
         switchScreen('screen-menu');
         document.title = "【極限超越】次元崩壊・超・診断占いシステム";
@@ -645,14 +876,15 @@
         currentData = shindanDatabase[id];
         currentIdx = 0;
         totalScore = 0;
-        
+
         applyTheme(currentData.theme, currentData.mode);
         document.title = currentData.title;
         switchScreen('screen-quiz');
-        
-        playThemeBGM(currentData.mode); 
-        
+
+        playThemeBGM(currentData.mode);
+
         document.getElementById("quiz-header").innerText = currentData.title;
+        document.getElementById("progress-label").innerText = "";
         document.getElementById("quiz-content").innerHTML = `<div class="main-text">${currentData.title}<br><br><span style="font-size:1rem;font-weight:normal;">全15問の診断を開始します。</span></div>`;
         document.getElementById("quiz-action").innerHTML = `
             <button onclick="loadQuestion()">診断を開始する</button>
@@ -662,11 +894,13 @@
 
     function loadQuestion() {
         if (currentIdx >= currentData.questions.length) { showAdScreen(); return; }
-        
-        const prog = (currentIdx / currentData.questions.length) * 100;
+
+        const total = currentData.questions.length;
+        const prog = (currentIdx / total) * 100;
         document.getElementById("progress-bar").style.width = prog + "%";
-        document.getElementById("quiz-header").innerText = `QUESTION: ${currentIdx + 1} / ${currentData.questions.length}`;
-        
+        document.getElementById("progress-label").innerText = `${currentIdx} / ${total}`;
+        document.getElementById("quiz-header").innerText = `QUESTION: ${currentIdx + 1} / ${total}`;
+
         document.getElementById("quiz-content").innerHTML = `<div class="main-text">${currentData.questions[currentIdx].text}</div>`;
         document.getElementById("quiz-action").innerHTML = `
             <button onclick="answer(true)">はい / YES</button>
@@ -684,12 +918,18 @@
 
     function showAdScreen() {
         document.getElementById("progress-bar").style.width = "100%";
+        document.getElementById("progress-label").innerText = `${currentData.questions.length} / ${currentData.questions.length}`;
         document.getElementById("quiz-header").innerText = "ANALYZING...";
-        
+
         document.getElementById("quiz-content").innerHTML = `
             <div class="analyzer-container">
-                <div class="magic-circle"></div>
-                <div class="main-text" style="margin-top:20px; font-size:1.1rem; color:#ccc;">深層心理を解析中...</div>
+                <div class="rings">
+                    <div class="ring r1"></div>
+                    <div class="ring r2"></div>
+                    <div class="ring r3"></div>
+                    <div class="ring-symbol">${currentData.symbol || "🔮"}</div>
+                </div>
+                <div class="main-text" style="margin-top:22px; font-size:1.05rem; color:#ccc;">深層心理を解析中...</div>
                 <div id="ad-timer" style="font-size:2rem; color:var(--accent-color); font-weight:bold;">5</div>
             </div>
         `;
@@ -707,9 +947,34 @@
         playHeavyClick();
         document.getElementById("quiz-header").innerText = "RESULT";
         let res = currentData.results.find(r => totalScore <= r.maxScore) || currentData.results[currentData.results.length-1];
-        
-        document.getElementById("quiz-content").innerHTML = `<div class="main-text" style="font-size:1.2rem; text-align:left; padding:10px;">${res.text}</div>`;
+
+        const maxTotal = currentData.questions.reduce((s, q) => s + q.score, 0);
+        const pct = Math.max(0, Math.min(100, Math.round((totalScore / maxTotal) * 100)));
+        const R = 52;
+        const circumference = 2 * Math.PI * R;
+
+        document.getElementById("quiz-content").innerHTML = `
+            <div class="gauge-wrap">
+                <svg viewBox="0 0 120 120" width="120" height="120">
+                    <circle cx="60" cy="60" r="${R}" stroke="rgba(255,255,255,0.12)" stroke-width="10" fill="none"/>
+                    <circle class="gauge-fill" cx="60" cy="60" r="${R}" stroke="var(--accent-color)" stroke-width="10" fill="none"
+                        stroke-linecap="round" transform="rotate(-90 60 60)"
+                        stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"/>
+                    <text x="60" y="67" text-anchor="middle" font-size="24" fill="#fff" font-weight="bold" font-family="inherit">${pct}%</text>
+                </svg>
+            </div>
+            <div class="result-label">診断結果</div>
+            <hr class="divider">
+            <div class="main-text result-text">${res.text}</div>
+        `;
         document.getElementById("quiz-action").innerHTML = `<button class="menu-btn" onclick="goHome()">🏠 トップに戻る</button>`;
+
+        const fillEl = document.querySelector('.gauge-fill');
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                fillEl.style.strokeDashoffset = circumference * (1 - pct / 100);
+            }, 50);
+        });
     }
 </script>
 
