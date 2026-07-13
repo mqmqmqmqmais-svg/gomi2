@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>【極限超越】次元崩壊・超・診断占いシステム</title>
     <style>
-        /* 🎨 変数定義 */
         :root {
             --bg-color: #000000;
-            --card-bg: rgba(10, 10, 15, 0.98); /* 不透明度を上げてより文字を読みやすく */
+            --card-bg: rgba(10, 10, 15, 0.98);
             --accent-color: #a252ff;
             --accent-glow: rgba(162, 82, 255, 0.8);
             --border-color: #5c2ea6;
             --text-color: #ffffff;
             --btn-bg: linear-gradient(180deg, #1f1135 0%, #05020a 100%);
-            --glitch-color1: #00ffff;
-            --glitch-color2: #ff00ff;
         }
 
         * {
@@ -39,7 +36,6 @@
             perspective: 1000px;
         }
 
-        /* 🌌 Canvas背景（パーティクルは維持） */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -51,7 +47,6 @@
             mix-blend-mode: screen;
         }
 
-        /* 背景の僅かなグラデーション */
         body::after {
             content: "";
             position: fixed;
@@ -64,7 +59,6 @@
             z-index: -1;
         }
 
-        /* 💡 広告エリア */
         .ad-container {
             width: 90%;
             max-width: 450px;
@@ -76,14 +70,13 @@
             align-items: center;
             color: var(--accent-color);
             font-size: 0.9rem;
-            font-weight: 900;
+            font-weight: bold;
             margin: 15px 0;
             border-radius: 4px;
             letter-spacing: 2px;
             z-index: 10;
         }
 
-        /* 📱 アプリコンテナ */
         #app-container {
             width: 95%;
             max-width: 450px;
@@ -98,11 +91,9 @@
             justify-content: space-between;
             position: relative;
             z-index: 10;
-            /* 強すぎたシャドウと揺れアニメーションを軽減 */
             box-shadow: 0 0 20px var(--accent-glow);
         }
 
-        /* 📊 プログレスバー */
         #progress-container {
             width: 100%;
             height: 12px;
@@ -140,7 +131,6 @@
             overflow-y: auto;
         }
 
-        /* 💥 メインテキスト（過剰なシャドウを削除し、純粋に読みやすく） */
         #main-text {
             font-size: 1.3rem;
             line-height: 1.6;
@@ -159,7 +149,6 @@
             padding-bottom: 10px;
         }
 
-        /* ✨ ボタン */
         button, .menu-btn {
             background: var(--btn-bg);
             color: #fff;
@@ -176,13 +165,21 @@
             transition: transform 0.1s, background 0.2s;
         }
 
-        /* ボタンのホバー＆アクティブ（フラッシュなし、少し沈むだけ） */
         button:active, .menu-btn:active {
             transform: translateY(3px);
             background: var(--border-color);
         }
 
-        /* 🌀 広告待機中のエフェクト */
+        /* 🏠 ホームへ戻る専用の控えめボタン */
+        .home-btn {
+            background: transparent;
+            border: 1px dashed #666;
+            color: #aaa;
+            padding: 12px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
         .analyzer-container {
             display: flex;
             flex-direction: column;
@@ -207,9 +204,7 @@
 </head>
 <body>
 
-    <!-- 粒子描画用キャンバス -->
     <canvas id="bg-canvas"></canvas>
-
     <div class="ad-container" id="top-ad">【NEON AD SPACE: TOP】</div>
 
     <div id="app-container">
@@ -218,19 +213,20 @@
         </div>
         <div id="question-number">SYSTEM BOOTING...</div>
         <div id="content-area">
-            <div id="main-text" style="font-size:1.5rem;">🔮 超次元診断ポータル 🔮<br><span style="font-size:1rem; color:#aaa; font-weight:normal;">テーマを選択してください</span></div>
+            <div id="main-text" style="font-size:1.4rem;">🔮 超次元診断ポータル 🔮<br><span style="font-size:1rem; color:#aaa; font-weight:normal;">テーマを選択してください</span></div>
         </div>
         <div id="action-area">
             <a href="?id=psycho" class="menu-btn" style="--accent-color:#ff003c; --border-color:#8a0020; --btn-bg:linear-gradient(180deg, #2a000a, #000);" onclick="playHeavyClick()">☠ 1. サイコパス狂気診断</a>
             <a href="?id=talent" class="menu-btn" style="--accent-color:#00ff00; --border-color:#008a00; --btn-bg:linear-gradient(180deg, #002a00, #000);" onclick="playHeavyClick()">⚡ 2. 神殺しの器・才能覚醒診断</a>
             <a href="?id=future" class="menu-btn" style="--accent-color:#ffaa00; --border-color:#8a5c00; --btn-bg:linear-gradient(180deg, #2a1c00, #000);" onclick="playHeavyClick()">🌌 3. 来世の業象・時空転生診断</a>
+            <a href="?id=romance" class="menu-btn" style="--accent-color:#ff0088; --border-color:#a6005c; --btn-bg:linear-gradient(180deg, #33001a, #000);" onclick="playHeavyClick()">💖 4. 狂愛の果て・恋愛依存度診断</a>
+            <a href="?id=mental" class="menu-btn" style="--accent-color:#00e5ff; --border-color:#0082a6; --btn-bg:linear-gradient(180deg, #002233, #000);" onclick="playHeavyClick()">🌊 5. 奈落の底・メンタル強度診断</a>
         </div>
     </div>
 
     <div class="ad-container" id="bottom-ad">【NEON AD SPACE: BOTTOM】</div>
 
 <script>
-    /* 🎵 クリック音のみ（フラッシュ・画面揺れは削除） */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playHeavyClick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -250,11 +246,11 @@
         osc.stop(t + 0.1);
     }
 
-    /* 🌌 Canvasパーティクル演算（エフェクトは維持） */
+    /* 🌌 Canvasパーティクル：全5種類の独立したエフェクト */
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
-    let particleMode = 'default'; // default, psycho, talent, future
+    let particleMode = 'default'; 
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -267,31 +263,48 @@
         constructor() { this.reset(); }
         reset() {
             if(particleMode === 'psycho') {
-                this.x = canvas.width / 2 + (Math.random() - 0.5) * 20;
-                this.y = canvas.height / 2 + (Math.random() - 0.5) * 20;
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 20 + 5;
-                this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
+                // 【エフェクト1】血の滴り・スプラッター（重力で落ちる）
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.5 - 50;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = Math.random() * 3 + 1;
                 this.size = Math.random() * 6 + 2;
-                this.color = `rgba(255, 0, ${Math.random()*40}, ${Math.random()*0.8 + 0.2})`;
+                this.color = `rgba(180, 0, 20, ${Math.random() * 0.8 + 0.2})`;
             } else if(particleMode === 'talent') {
+                // 【エフェクト2】マトリックス（上から下へ等速落下）
                 this.x = Math.floor(Math.random() * (canvas.width/20)) * 20;
                 this.y = -Math.random() * canvas.height;
                 this.vx = 0;
-                this.vy = Math.random() * 30 + 10;
+                this.vy = Math.random() * 20 + 10;
                 this.size = Math.random() * 2 + 1;
                 this.color = `rgba(0, 255, ${Math.random()*150+100}, 0.9)`;
                 this.char = String.fromCharCode(0x30A0 + Math.random() * 96);
             } else if(particleMode === 'future') {
+                // 【エフェクト3】ワープ（中央から放射状に拡大）
                 this.x = canvas.width / 2;
                 this.y = canvas.height / 2;
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 15 + 2;
+                const speed = Math.random() * 10 + 2;
                 this.vx = Math.cos(angle) * speed;
                 this.vy = Math.sin(angle) * speed; 
-                this.size = Math.random() * 3 + 1;
+                this.size = Math.random() * 2 + 1;
                 this.color = `rgba(255, ${Math.random()*100+150}, 0, 0.8)`;
+            } else if(particleMode === 'romance') {
+                // 【エフェクト4】狂愛の竜巻（画面外周から中心へ向かって渦巻く）
+                this.angle = Math.random() * Math.PI * 2;
+                this.radius = Math.random() * canvas.width;
+                this.speed = Math.random() * 0.05 + 0.01;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.color = `rgba(255, ${Math.random()*100}, ${Math.random()*100 + 100}, 0.8)`;
+            } else if(particleMode === 'mental') {
+                // 【エフェクト5】奈落の泡（深海の下から上へ高速で揺らめきながら上昇）
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = -(Math.random() * 8 + 4);
+                this.size = Math.random() * 5 + 2;
+                this.color = `rgba(0, ${Math.random()*150+100}, 255, 0.6)`;
             } else {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
@@ -302,10 +315,29 @@
             }
         }
         update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            if(particleMode === 'future' || particleMode === 'psycho') this.size *= 1.05;
-            if (this.y > canvas.height || this.y < 0 || this.x > canvas.width || this.x < 0) this.reset();
+            if(particleMode === 'psycho') {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.1; // 重力加速度
+                this.size *= 0.99; // 徐々に細くなる
+                if (this.size < 0.5 || this.y > canvas.height) this.reset();
+            } else if(particleMode === 'romance') {
+                this.angle += this.speed;
+                this.radius -= 2; // 中心へ
+                this.x = canvas.width / 2 + Math.cos(this.angle) * this.radius;
+                this.y -= 1; // やや上に昇る
+                if (this.radius < 10 || this.y < 0) this.reset();
+            } else if(particleMode === 'mental') {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.x += Math.sin(this.y * 0.05); // 水中の揺らめき
+                if (this.y < -20) this.reset();
+            } else {
+                this.x += this.vx;
+                this.y += this.vy;
+                if(particleMode === 'future') this.size *= 1.05; // 迫ってくる感
+                if (this.y > canvas.height || this.y < 0 || this.x > canvas.width || this.x < 0) this.reset();
+            }
         }
         draw() {
             ctx.fillStyle = this.color;
@@ -330,7 +362,7 @@
     }
     animateParticles();
 
-    /* 💡 テーマ別データベース（診断内容を正常化・最適化） */
+    /* 💡 テーマ別データベース（新診断2つ追加） */
     const shindanDatabase = {
         psycho: {
             title: "☠ サイコパス狂気診断",
@@ -382,6 +414,40 @@
                 { maxScore: 10, text: "【来世の姿：自然界の精霊・動物】\n人間の複雑な感情や社会構造に少し疲れているようです。来世はしがらみのない、自由な動物や、自然と調和する存在に転生し、穏やかで平和な時を過ごすでしょう。" },
                 { maxScore: 99, text: "【来世の姿：宇宙の星々・エネルギー体】\nあなたの魂は地球という枠組みを卒業する段階に来ています。来世では肉体を持たず、宇宙を漂う星や、純粋なエネルギー体として高次元の世界を旅することになるでしょう。" }
             ]
+        },
+        romance: {
+            title: "💖 狂愛の果て・恋愛依存度診断",
+            mode: "romance",
+            theme: { bg: "#10000a", card: "rgba(20, 0, 15, 0.95)", accent: "#ff0088", glow: "rgba(255, 0, 136, 0.8)", border: "#a6005c", btn: "linear-gradient(180deg, #33001a, #000)" },
+            questions: [
+                { text: "恋人からのLINEの返信が1時間無いだけで、何かあったのではと不安になる。", score: 3 },
+                { text: "相手のSNS（いいね欄やフォロー欄など）をつい監視してしまう。", score: 3 },
+                { text: "自分の趣味や友達との予定よりも、恋人との予定を最優先にする。", score: 2 },
+                { text: "「自分がいなければこの人はダメになる」と思ったことがある。", score: 2 },
+                { text: "相手の行動をすべて把握していないと気が済まない。", score: 3 }
+            ],
+            results: [
+                { maxScore: 4, text: "【依存度：低（自立した恋愛）】\nあなたは精神的に自立しており、恋愛と自分の生活をしっかり分けて考えることができます。お互いを尊重し合える、非常に健全な関係を築けるタイプです。" },
+                { maxScore: 9, text: "【依存度：中（ロマンチスト）】\n少し相手に寄りかかりやすい部分がありますが、ごく普通の恋愛感情の範囲内です。相手を大切に思うあまり不安になることもありますが、冷静さを保つ努力ができています。" },
+                { maxScore: 99, text: "【依存度：高（底なしの狂愛）】\nかなり恋愛依存の傾向が強いです。相手への愛が重すぎて、束縛や過干渉になってしまう危険性があります。まずは自分の時間を大切にし、心に余裕を持つことが必要です。" }
+            ]
+        },
+        mental: {
+            title: "🌊 奈落の底・メンタル強度診断",
+            mode: "mental",
+            theme: { bg: "#000510", card: "rgba(0, 10, 20, 0.95)", accent: "#00e5ff", glow: "rgba(0, 229, 255, 0.8)", border: "#0082a6", btn: "linear-gradient(180deg, #002233, #000)" },
+            questions: [
+                { text: "他人から軽く注意されただけで、一日中そのことを引きずってしまう。", score: 3 },
+                { text: "寝る前になると、過去の失敗や不安なことばかりが頭に浮かぶ。", score: 3 },
+                { text: "自分は周りの人よりも運が悪く、損ばかりしていると感じる。", score: 2 },
+                { text: "プレッシャーがかかる場面では、本来の実力が全く出せなくなる。", score: 2 },
+                { text: "SNSなどで他人が楽しそうにしているのを見ると、ひどく落ち込む。", score: 3 }
+            ],
+            results: [
+                { maxScore: 4, text: "【メンタル強度：鋼（鉄壁の心）】\nあなたのメンタルは非常に強靭です。多少のストレスや失敗では動じず、すぐに切り替えて前に進むことができます。逆境に強いタフな精神力の持ち主です。" },
+                { maxScore: 9, text: "【メンタル強度：普通（しなやかな心）】\n落ち込むこともありますが、時間が経てば自力で回復できるバランスの良いメンタルです。ストレスを適度に受け流す術を知っています。" },
+                { maxScore: 99, text: "【メンタル強度：繊細（ガラスの心）】\n現在、あなたのメンタルは非常にすり減っている状態です。外部からの刺激に敏感で、ストレスを溜め込みやすくなっています。無理をせず、まずは心と体をゆっくり休める環境を作ってください。" }
+            ]
         }
     };
 
@@ -406,9 +472,14 @@
         applyTheme(currentData.theme);
         document.title = currentData.title;
         document.getElementById("progress-container").style.display = "block";
-        document.getElementById("action-area").innerHTML = `<button onclick="startQuestion()">診断を開始する</button>`;
+        document.getElementById("action-area").innerHTML = `<button onclick="startQuestion()">診断を開始する</button><button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>`;
         document.getElementById("main-text").innerText = currentData.title;
         document.getElementById("question-number").innerText = "READY";
+    }
+
+    function goHome() {
+        playHeavyClick();
+        window.location.href = window.location.pathname; // URLパラメータを消してトップへ
     }
 
     function startQuestion() {
@@ -428,6 +499,7 @@
         area.innerHTML = `
             <button onclick="answer(true)">はい / YES</button>
             <button onclick="answer(false)">いいえ / NO</button>
+            <button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>
         `;
     }
 
@@ -466,7 +538,7 @@
         let res = currentData.results.find(r => totalScore <= r.maxScore) || currentData.results[currentData.results.length-1];
         
         document.getElementById("content-area").innerHTML = `<div id="main-text" style="font-size:1.2rem; text-align:left; padding:10px;">${res.text}</div>`;
-        document.getElementById("action-area").innerHTML = `<a href="${window.location.pathname}" class="menu-btn" onclick="playHeavyClick()">トップに戻る</a>`;
+        document.getElementById("action-area").innerHTML = `<a href="${window.location.pathname}" class="menu-btn" onclick="playHeavyClick()">🏠 トップに戻る</a>`;
     }
 </script>
 
