@@ -22,7 +22,7 @@
         }
         
         body {
-            background-color: #000;
+            background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
             margin: 0;
@@ -34,6 +34,7 @@
             min-height: 100vh;
             overflow: hidden;
             perspective: 1000px;
+            transition: background-color 0.5s ease;
         }
 
         #bg-canvas {
@@ -81,17 +82,28 @@
             width: 95%;
             max-width: 450px;
             height: 70vh;
-            min-height: 500px;
+            min-height: 520px;
             background: var(--card-bg);
             border-radius: 12px;
             border: 2px solid var(--border-color);
             padding: 25px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             position: relative;
             z-index: 10;
             box-shadow: 0 0 20px var(--accent-glow);
+            transition: all 0.5s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 画面切り替え用のコンテナ */
+        .screen {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .screen.active {
+            display: flex;
         }
 
         #progress-container {
@@ -111,7 +123,7 @@
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        #question-number {
+        .header-title {
             font-size: 1rem;
             color: var(--accent-color);
             margin-bottom: 15px;
@@ -120,7 +132,7 @@
             text-align: center;
         }
 
-        #content-area {
+        .content-area {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -131,8 +143,8 @@
             overflow-y: auto;
         }
 
-        #main-text {
-            font-size: 1.3rem;
+        .main-text {
+            font-size: 1.2rem;
             line-height: 1.6;
             font-weight: bold;
             color: #ffffff;
@@ -141,11 +153,11 @@
             white-space: pre-wrap;
         }
 
-        #action-area {
+        .action-area {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             padding-bottom: 10px;
         }
 
@@ -153,7 +165,7 @@
             background: var(--btn-bg);
             color: #fff;
             border: 1px solid var(--border-color);
-            padding: 18px;
+            padding: 16px;
             font-size: 1.1rem;
             cursor: pointer;
             border-radius: 8px;
@@ -163,6 +175,7 @@
             text-align: center;
             letter-spacing: 1px;
             transition: transform 0.1s, background 0.2s;
+            width: 100%;
         }
 
         button:active, .menu-btn:active {
@@ -170,7 +183,7 @@
             background: var(--border-color);
         }
 
-        /* 🏠 ホームへ戻る専用の控えめボタン */
+        /* 🏠 ホームボタン */
         .home-btn {
             background: transparent;
             border: 1px dashed #666;
@@ -205,26 +218,38 @@
 <body>
 
     <canvas id="bg-canvas"></canvas>
-    <div class="ad-container" id="top-ad">【NEON AD SPACE: TOP】</div>
+    <div class="ad-container">【NEON AD SPACE: TOP】</div>
 
     <div id="app-container">
-        <div id="progress-container" style="display:none;">
-            <div id="progress-bar"></div>
+        
+        <div id="screen-menu" class="screen active">
+            <div class="header-title">SYSTEM BOOTING...</div>
+            <div class="content-area">
+                <div class="main-text" style="font-size:1.4rem;">🔮 超次元診断ポータル 🔮<br><span style="font-size:1rem; color:#aaa; font-weight:normal;">テーマを選択してください</span></div>
+            </div>
+            <div class="action-area">
+                <button class="menu-btn" style="--accent-color:#ff003c; --border-color:#8a0020; --btn-bg:linear-gradient(180deg, #2a000a, #000);" onclick="startDiagnosis('psycho')">☠ 1. サイコパス狂気診断</button>
+                <button class="menu-btn" style="--accent-color:#00ff00; --border-color:#008a00; --btn-bg:linear-gradient(180deg, #002a00, #000);" onclick="startDiagnosis('talent')">⚡ 2. 神殺しの器・才能覚醒診断</button>
+                <button class="menu-btn" style="--accent-color:#ffaa00; --border-color:#8a5c00; --btn-bg:linear-gradient(180deg, #2a1c00, #000);" onclick="startDiagnosis('future')">🌌 3. 来世の業象・時空転生診断</button>
+                <button class="menu-btn" style="--accent-color:#ff0088; --border-color:#a6005c; --btn-bg:linear-gradient(180deg, #33001a, #000);" onclick="startDiagnosis('romance')">💖 4. 狂愛の果て・恋愛依存度診断</button>
+                <button class="menu-btn" style="--accent-color:#00e5ff; --border-color:#0082a6; --btn-bg:linear-gradient(180deg, #002233, #000);" onclick="startDiagnosis('mental')">🌊 5. 奈落の底・メンタル強度診断</button>
+            </div>
         </div>
-        <div id="question-number">SYSTEM BOOTING...</div>
-        <div id="content-area">
-            <div id="main-text" style="font-size:1.4rem;">🔮 超次元診断ポータル 🔮<br><span style="font-size:1rem; color:#aaa; font-weight:normal;">テーマを選択してください</span></div>
+
+        <div id="screen-quiz" class="screen">
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div class="header-title" id="quiz-header">READY</div>
+            <div class="content-area" id="quiz-content">
+                </div>
+            <div class="action-area" id="quiz-action">
+                </div>
         </div>
-        <div id="action-area">
-            <a href="?id=psycho" class="menu-btn" style="--accent-color:#ff003c; --border-color:#8a0020; --btn-bg:linear-gradient(180deg, #2a000a, #000);" onclick="playHeavyClick()">☠ 1. サイコパス狂気診断</a>
-            <a href="?id=talent" class="menu-btn" style="--accent-color:#00ff00; --border-color:#008a00; --btn-bg:linear-gradient(180deg, #002a00, #000);" onclick="playHeavyClick()">⚡ 2. 神殺しの器・才能覚醒診断</a>
-            <a href="?id=future" class="menu-btn" style="--accent-color:#ffaa00; --border-color:#8a5c00; --btn-bg:linear-gradient(180deg, #2a1c00, #000);" onclick="playHeavyClick()">🌌 3. 来世の業象・時空転生診断</a>
-            <a href="?id=romance" class="menu-btn" style="--accent-color:#ff0088; --border-color:#a6005c; --btn-bg:linear-gradient(180deg, #33001a, #000);" onclick="playHeavyClick()">💖 4. 狂愛の果て・恋愛依存度診断</a>
-            <a href="?id=mental" class="menu-btn" style="--accent-color:#00e5ff; --border-color:#0082a6; --btn-bg:linear-gradient(180deg, #002233, #000);" onclick="playHeavyClick()">🌊 5. 奈落の底・メンタル強度診断</a>
-        </div>
+
     </div>
 
-    <div class="ad-container" id="bottom-ad">【NEON AD SPACE: BOTTOM】</div>
+    <div class="ad-container">【NEON AD SPACE: BOTTOM】</div>
 
 <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -246,7 +271,7 @@
         osc.stop(t + 0.1);
     }
 
-    /* 🌌 Canvasパーティクル：全5種類の独立したエフェクト */
+    /* 🌌 Canvasエフェクトロジック */
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -263,13 +288,14 @@
         constructor() { this.reset(); }
         reset() {
             if(particleMode === 'psycho') {
-                // 【エフェクト1】血の滴り・スプラッター（重力で落ちる）
+                // 【エフェクト1・変更】高速で横切る赤黒い斬撃（レーザー）
                 this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height * 0.5 - 50;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = Math.random() * 3 + 1;
-                this.size = Math.random() * 6 + 2;
-                this.color = `rgba(180, 0, 20, ${Math.random() * 0.8 + 0.2})`;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 20 + 10);
+                this.vy = 0;
+                this.width = Math.random() * 100 + 20; // 横に長い線
+                this.height = Math.random() * 3 + 1;
+                this.color = `rgba(255, 0, ${Math.random()*30}, ${Math.random() * 0.8 + 0.2})`;
             } else if(particleMode === 'talent') {
                 // 【エフェクト2】マトリックス（上から下へ等速落下）
                 this.x = Math.floor(Math.random() * (canvas.width/20)) * 20;
@@ -306,6 +332,7 @@
                 this.size = Math.random() * 5 + 2;
                 this.color = `rgba(0, ${Math.random()*150+100}, 255, 0.6)`;
             } else {
+                // デフォルト（紫の粒子が漂う）
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.vx = (Math.random() - 0.5);
@@ -317,25 +344,22 @@
         update() {
             if(particleMode === 'psycho') {
                 this.x += this.vx;
-                this.y += this.vy;
-                this.vy += 0.1; // 重力加速度
-                this.size *= 0.99; // 徐々に細くなる
-                if (this.size < 0.5 || this.y > canvas.height) this.reset();
+                if (this.x > canvas.width + this.width || this.x < -this.width) this.reset();
             } else if(particleMode === 'romance') {
                 this.angle += this.speed;
-                this.radius -= 2; // 中心へ
+                this.radius -= 2; 
                 this.x = canvas.width / 2 + Math.cos(this.angle) * this.radius;
-                this.y -= 1; // やや上に昇る
+                this.y -= 1; 
                 if (this.radius < 10 || this.y < 0) this.reset();
             } else if(particleMode === 'mental') {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.x += Math.sin(this.y * 0.05); // 水中の揺らめき
+                this.x += Math.sin(this.y * 0.05); 
                 if (this.y < -20) this.reset();
             } else {
                 this.x += this.vx;
                 this.y += this.vy;
-                if(particleMode === 'future') this.size *= 1.05; // 迫ってくる感
+                if(particleMode === 'future') this.size *= 1.05; 
                 if (this.y > canvas.height || this.y < 0 || this.x > canvas.width || this.x < 0) this.reset();
             }
         }
@@ -344,6 +368,9 @@
             if(particleMode === 'talent') {
                 ctx.font = 'bold 18px monospace';
                 ctx.fillText(this.char, this.x, this.y);
+            } else if(particleMode === 'psycho') {
+                // 斬撃（四角形）
+                ctx.fillRect(this.x, this.y, this.width, this.height);
             } else {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -362,100 +389,145 @@
     }
     animateParticles();
 
-    /* 💡 テーマ別データベース（新診断2つ追加） */
+    /* 💡 テーマ別データベース（全15問に拡張！） */
     const shindanDatabase = {
         psycho: {
-            title: "☠ サイコパス狂気診断",
-            mode: "psycho",
+            title: "☠ サイコパス狂気診断", mode: "psycho",
             theme: { bg: "#0a0000", card: "rgba(20, 0, 0, 0.95)", accent: "#ff003c", glow: "rgba(255, 0, 60, 0.8)", border: "#8a0020", btn: "linear-gradient(180deg, #3a000d, #000)" },
             questions: [
                 { text: "他人が悲しんでいたり、泣いているのを見ても、あまり何も感じない。", score: 3 },
                 { text: "自分の目的を達成するためなら、多少嘘をついたり人を騙しても構わないと思う。", score: 3 },
                 { text: "カッとなると、後先考えずに衝動的な行動をとってしまうことが多い。", score: 2 },
                 { text: "自分は他の人よりも特別で、優れている人間だと心の底で思っている。", score: 2 },
-                { text: "悪いことをしても、「仕方なかった」「自分のせいではない」と言い訳を見つけるのが得意だ。", score: 3 }
+                { text: "悪いことをしても、「仕方なかった」「自分のせいではない」と言い訳を見つけるのが得意だ。", score: 3 },
+                { text: "危険なことやスリルがあることによく惹かれる。", score: 2 },
+                { text: "過去の失敗から学ぶのが苦手で、同じ過ちを繰り返す。", score: 2 },
+                { text: "自分の行動が他人にどういう影響を与えるか、あまり考えない。", score: 3 },
+                { text: "表面上、他人と合わせて魅力的に振る舞うのは得意だ。", score: 3 },
+                { text: "長期的な目標を立ててコツコツ努力するのが極めて苦手だ。", score: 2 },
+                { text: "お金や物を他人に依存して生活することに抵抗がない。", score: 2 },
+                { text: "幼少期から、親や先生のルールを破ることが多かった。", score: 3 },
+                { text: "他人の秘密を知ったら、自分の有利になるよう利用したくなる。", score: 3 },
+                { text: "感情が長続きせず、怒ってもすぐに忘れることが多い。", score: 2 },
+                { text: "責任ある立場を任されると、すぐに投げ出したくなる。", score: 2 }
             ],
             results: [
-                { maxScore: 5, text: "【サイコパス度：低（0〜30%）】\nあなたはごく一般的な良識と共感性を持った人です。他人の痛みがわかり、ルールを守ろうとする正常な感覚を持っています。安心して社会生活を送ってください。" },
-                { maxScore: 10, text: "【サイコパス度：中（40〜70%）】\n少し自己中心的な面があるようです。合理的な判断が得意な反面、冷たい印象を持たれることがあるかもしれません。時と場合によってはサイコパス的な思考を活用できるタイプです。" },
+                { maxScore: 15, text: "【サイコパス度：低（0〜30%）】\nあなたはごく一般的な良識と共感性を持った人です。他人の痛みがわかり、ルールを守ろうとする正常な感覚を持っています。安心して社会生活を送ってください。" },
+                { maxScore: 30, text: "【サイコパス度：中（40〜70%）】\n少し自己中心的な面があるようです。合理的な判断が得意な反面、冷たい印象を持たれることがあるかもしれません。時と場合によってはサイコパス的な思考を活用できるタイプです。" },
                 { maxScore: 99, text: "【サイコパス度：高（80%〜）】\nサイコパス傾向が非常に高いです。他者への共感が乏しく、目的のためなら手段を選ばない冷徹さを持っています。その合理性を活かせる場所を見つければ大成するかもしれません。" }
             ]
         },
         talent: {
-            title: "⚡ 神殺しの器・才能覚醒診断",
-            mode: "talent",
+            title: "⚡ 神殺しの器・才能覚醒診断", mode: "talent",
             theme: { bg: "#000a05", card: "rgba(0, 20, 10, 0.95)", accent: "#00ffaa", glow: "rgba(0, 255, 170, 0.8)", border: "#008a4c", btn: "linear-gradient(180deg, #003a20, #000)" },
             questions: [
                 { text: "既存のルールやマニュアルに従うよりも、自分で全く新しいやり方を考える方が好きだ。", score: 3 },
                 { text: "興味を持ったことには、寝食を忘れるほど異常な集中力を発揮する。", score: 2 },
                 { text: "周りの人が「常識だ」と言っていることに対して、「本当にそうか？」と疑問を持つことが多い。", score: 3 },
                 { text: "感情論で話されるのが苦手で、常に論理的・合理的な解決策を求めてしまう。", score: 2 },
-                { text: "誰も思いつかないような突飛なアイデアをひらめく瞬間がよくある。", score: 3 }
+                { text: "誰も思いつかないような突飛なアイデアをひらめく瞬間がよくある。", score: 3 },
+                { text: "学校や会社の単調なルーティンワークには耐えられない。", score: 2 },
+                { text: "物事の「本質」や「隠れた法則」を瞬時に見抜くことがある。", score: 3 },
+                { text: "リスクを取ってでも、自分のやり方を試したい衝動に駆られる。", score: 2 },
+                { text: "誰かに教わるより、独学で自由に学ぶ方が圧倒的に早い。", score: 3 },
+                { text: "無駄や非効率なシステムを見ると、イライラして壊したくなる。", score: 2 },
+                { text: "興味のないことには、1ミリもやる気が起きない。", score: 2 },
+                { text: "肩書きや年齢など、上下関係を気にするのは無意味だと思う。", score: 3 },
+                { text: "「なぜ？」という疑問が尽きず、納得するまで調べ続ける。", score: 2 },
+                { text: "誰もやっていない全く新しい分野にこそ、価値があると思う。", score: 3 },
+                { text: "頭の中の思考スピードに、言葉や行動が追いつかないことがある。", score: 2 }
             ],
             results: [
-                { maxScore: 5, text: "【適応型タレント：協調性の才能】\nあなたの才能は「和を尊ぶ」ことにあります。組織の中でうまく立ち回り、チームを円滑に進めるバランス感覚に優れています。突飛な才能よりも、堅実な努力で成功するタイプです。" },
-                { maxScore: 10, text: "【開拓型タレント：アイデアの才能】\n一般的な常識に囚われない、柔軟な発想力を持っています。新しい企画を立ち上げたり、問題を別の角度から解決するクリエイターとしての才能が眠っているようです。" },
+                { maxScore: 15, text: "【適応型タレント：協調性の才能】\nあなたの才能は「和を尊ぶ」ことにあります。組織の中でうまく立ち回り、チームを円滑に進めるバランス感覚に優れています。突飛な才能よりも、堅実な努力で成功するタイプです。" },
+                { maxScore: 30, text: "【開拓型タレント：アイデアの才能】\n一般的な常識に囚われない、柔軟な発想力を持っています。新しい企画を立ち上げたり、問題を別の角度から解決するクリエイターとしての才能が眠っているようです。" },
                 { maxScore: 99, text: "【革命型タレント：破壊と創造の才能】\n既存のシステムを根本から覆す、天才的な（あるいは異端な）才能を秘めています。常識にとらわれず、ゼロからイチを生み出す圧倒的な熱量とビジョンを持つイノベーター気質です。" }
             ]
         },
         future: {
-            title: "🌌 来世の業象・時空転生診断",
-            mode: "future",
+            title: "🌌 来世の業象・時空転生診断", mode: "future",
             theme: { bg: "#050010", card: "rgba(10, 0, 20, 0.95)", accent: "#ffaa00", glow: "rgba(255, 170, 0, 0.8)", border: "#8a00cc", btn: "linear-gradient(180deg, #3a0066, #000)" },
             questions: [
                 { text: "自然や動物と触れ合っていると、人間関係の悩みなどどうでもよくなる。", score: 2 },
                 { text: "時々、今の自分が生きているこの時代や場所に「違和感」を覚えることがある。", score: 3 },
                 { text: "争いごとや競争社会には疲れ果てており、とにかく穏やかに過ごしたい。", score: 2 },
                 { text: "人間という生き物の複雑な感情やしがらみが、ひどく面倒だと感じる。", score: 3 },
-                { text: "星空や宇宙の映像を見ていると、なぜか懐かしい気持ちになる。", score: 3 }
+                { text: "星空や宇宙の映像を見ていると、なぜか懐かしい気持ちになる。", score: 3 },
+                { text: "集団の中にいるより、一人でいる時の方が本来の自分でいられる。", score: 2 },
+                { text: "デジャヴ（既視感）を経験することが人より多い気がする。", score: 2 },
+                { text: "動物や植物の「感情」や「言いたいこと」がなんとなく分かる。", score: 3 },
+                { text: "実年齢よりも、精神年齢がずっと高い（老成している）と言われる。", score: 2 },
+                { text: "現実離れした、別世界や宇宙の鮮明な夢をよく見る。", score: 3 },
+                { text: "傷ついている人や動物を見ると、自分が身代わりになりたいと思う。", score: 2 },
+                { text: "この世界で何か「果たすべき使命」があるような気がしてならない。", score: 3 },
+                { text: "人混みや騒音の激しい場所にいると、異常にエネルギーを消耗する。", score: 2 },
+                { text: "理屈ではなく、「直感」で正しい選択が分かることが多い。", score: 3 },
+                { text: "お金や地位などの物質的な豊かさには、あまり価値を感じない。", score: 2 }
             ],
             results: [
-                { maxScore: 5, text: "【来世の姿：人間への再転生】\nあなたの魂は、まだ人間社会での学びやドラマにやり残したことがあるようです。来世でも再び人間として生まれ、より豊かな人生の経験を積んでいくことになるでしょう。" },
-                { maxScore: 10, text: "【来世の姿：自然界の精霊・動物】\n人間の複雑な感情や社会構造に少し疲れているようです。来世はしがらみのない、自由な動物や、自然と調和する存在に転生し、穏やかで平和な時を過ごすでしょう。" },
+                { maxScore: 15, text: "【来世の姿：人間への再転生】\nあなたの魂は、まだ人間社会での学びやドラマにやり残したことがあるようです。来世でも再び人間として生まれ、より豊かな人生の経験を積んでいくことになるでしょう。" },
+                { maxScore: 30, text: "【来世の姿：自然界の精霊・動物】\n人間の複雑な感情や社会構造に少し疲れているようです。来世はしがらみのない、自由な動物や、自然と調和する存在に転生し、穏やかで平和な時を過ごすでしょう。" },
                 { maxScore: 99, text: "【来世の姿：宇宙の星々・エネルギー体】\nあなたの魂は地球という枠組みを卒業する段階に来ています。来世では肉体を持たず、宇宙を漂う星や、純粋なエネルギー体として高次元の世界を旅することになるでしょう。" }
             ]
         },
         romance: {
-            title: "💖 狂愛の果て・恋愛依存度診断",
-            mode: "romance",
+            title: "💖 狂愛の果て・恋愛依存度診断", mode: "romance",
             theme: { bg: "#10000a", card: "rgba(20, 0, 15, 0.95)", accent: "#ff0088", glow: "rgba(255, 0, 136, 0.8)", border: "#a6005c", btn: "linear-gradient(180deg, #33001a, #000)" },
             questions: [
                 { text: "恋人からのLINEの返信が1時間無いだけで、何かあったのではと不安になる。", score: 3 },
                 { text: "相手のSNS（いいね欄やフォロー欄など）をつい監視してしまう。", score: 3 },
                 { text: "自分の趣味や友達との予定よりも、恋人との予定を最優先にする。", score: 2 },
                 { text: "「自分がいなければこの人はダメになる」と思ったことがある。", score: 2 },
-                { text: "相手の行動をすべて把握していないと気が済まない。", score: 3 }
+                { text: "相手の行動をすべて把握していないと気が済まない。", score: 3 },
+                { text: "恋人の好みに合わせて、自分の趣味や服装をガラリと変える。", score: 2 },
+                { text: "恋人に嫌われるのが怖くて、自分の本音を言えないことが多い。", score: 2 },
+                { text: "友人からの遊びの誘いも、恋人から連絡が来るかもしれないから断る。", score: 3 },
+                { text: "相手のちょっとした言葉や態度で、一日中気分が上がったり落ちたりする。", score: 2 },
+                { text: "恋人と別れるくらいなら、死んだほうがマシだと本気で思う。", score: 3 },
+                { text: "相手のスマホをこっそりチェックしたことがある（またはしたい）。", score: 3 },
+                { text: "自分がこれだけ尽くしているのだから、相手も同じだけ返すのが当然だ。", score: 2 },
+                { text: "恋人が他の異性と話しているのを見るだけで、激しい怒りを感じる。", score: 3 },
+                { text: "「私にはこの人しかいない」という思い込みが非常に強い。", score: 2 },
+                { text: "恋人の予定を1日の単位ですべて把握しておかないと不安だ。", score: 3 }
             ],
             results: [
-                { maxScore: 4, text: "【依存度：低（自立した恋愛）】\nあなたは精神的に自立しており、恋愛と自分の生活をしっかり分けて考えることができます。お互いを尊重し合える、非常に健全な関係を築けるタイプです。" },
-                { maxScore: 9, text: "【依存度：中（ロマンチスト）】\n少し相手に寄りかかりやすい部分がありますが、ごく普通の恋愛感情の範囲内です。相手を大切に思うあまり不安になることもありますが、冷静さを保つ努力ができています。" },
+                { maxScore: 15, text: "【依存度：低（自立した恋愛）】\nあなたは精神的に自立しており、恋愛と自分の生活をしっかり分けて考えることができます。お互いを尊重し合える、非常に健全な関係を築けるタイプです。" },
+                { maxScore: 30, text: "【依存度：中（ロマンチスト）】\n少し相手に寄りかかりやすい部分がありますが、ごく普通の恋愛感情の範囲内です。相手を大切に思うあまり不安になることもありますが、冷静さを保つ努力ができています。" },
                 { maxScore: 99, text: "【依存度：高（底なしの狂愛）】\nかなり恋愛依存の傾向が強いです。相手への愛が重すぎて、束縛や過干渉になってしまう危険性があります。まずは自分の時間を大切にし、心に余裕を持つことが必要です。" }
             ]
         },
         mental: {
-            title: "🌊 奈落の底・メンタル強度診断",
-            mode: "mental",
+            title: "🌊 奈落の底・メンタル強度診断", mode: "mental",
             theme: { bg: "#000510", card: "rgba(0, 10, 20, 0.95)", accent: "#00e5ff", glow: "rgba(0, 229, 255, 0.8)", border: "#0082a6", btn: "linear-gradient(180deg, #002233, #000)" },
             questions: [
                 { text: "他人から軽く注意されただけで、一日中そのことを引きずってしまう。", score: 3 },
                 { text: "寝る前になると、過去の失敗や不安なことばかりが頭に浮かぶ。", score: 3 },
                 { text: "自分は周りの人よりも運が悪く、損ばかりしていると感じる。", score: 2 },
                 { text: "プレッシャーがかかる場面では、本来の実力が全く出せなくなる。", score: 2 },
-                { text: "SNSなどで他人が楽しそうにしているのを見ると、ひどく落ち込む。", score: 3 }
+                { text: "SNSなどで他人が楽しそうにしているのを見ると、ひどく落ち込む。", score: 3 },
+                { text: "人からどう思われているか気になりすぎて、発言できないことが多い。", score: 2 },
+                { text: "突然、理由もなく不安や焦燥感に襲われることがある。", score: 3 },
+                { text: "自分の体調不良（頭痛や胃痛など）は、ストレスが原因だと感じることが多い。", score: 2 },
+                { text: "将来のことを考えると、希望よりも絶望や不安の方が大きい。", score: 3 },
+                { text: "頼まれごとをされると、自分が忙しくても断りきれない。", score: 2 },
+                { text: "日常の些細なタスク（掃除やメール返信など）が、とてつもなく重労働に感じる。", score: 2 },
+                { text: "自分が今の立場や評価に見合っていない「偽物」だと感じることがある。", score: 2 },
+                { text: "誰かが怒られているのを見ると、自分が責められているように錯覚する。", score: 3 },
+                { text: "最悪の事態ばかりを想像してしまい、行動を起こせなくなる。", score: 3 },
+                { text: "休日でも仕事や学校のことが頭から離れず、全く休まらない。", score: 2 }
             ],
             results: [
-                { maxScore: 4, text: "【メンタル強度：鋼（鉄壁の心）】\nあなたのメンタルは非常に強靭です。多少のストレスや失敗では動じず、すぐに切り替えて前に進むことができます。逆境に強いタフな精神力の持ち主です。" },
-                { maxScore: 9, text: "【メンタル強度：普通（しなやかな心）】\n落ち込むこともありますが、時間が経てば自力で回復できるバランスの良いメンタルです。ストレスを適度に受け流す術を知っています。" },
+                { maxScore: 15, text: "【メンタル強度：鋼（鉄壁の心）】\nあなたのメンタルは非常に強靭です。多少のストレスや失敗では動じず、すぐに切り替えて前に進むことができます。逆境に強いタフな精神力の持ち主です。" },
+                { maxScore: 30, text: "【メンタル強度：普通（しなやかな心）】\n落ち込むこともありますが、時間が経てば自力で回復できるバランスの良いメンタルです。ストレスを適度に受け流す術を知っています。" },
                 { maxScore: 99, text: "【メンタル強度：繊細（ガラスの心）】\n現在、あなたのメンタルは非常にすり減っている状態です。外部からの刺激に敏感で、ストレスを溜め込みやすくなっています。無理をせず、まずは心と体をゆっくり休める環境を作ってください。" }
             ]
         }
     };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const shindanId = urlParams.get('id');
+    /* SPA ロジック（URL移動なしで画面を切り替える） */
     let currentIdx = 0, totalScore = 0, currentData = null;
+    const defaultTheme = { bg: "#000000", card: "rgba(10, 10, 15, 0.98)", accent: "#a252ff", glow: "rgba(162, 82, 255, 0.8)", border: "#5c2ea6", btn: "linear-gradient(180deg, #1f1135, #05020a)" };
 
-    function applyTheme(t) {
+    function applyTheme(t, mode) {
         const r = document.documentElement;
         r.style.setProperty('--bg-color', t.bg);
         r.style.setProperty('--card-bg', t.card);
@@ -463,28 +535,38 @@
         r.style.setProperty('--accent-glow', t.glow);
         r.style.setProperty('--border-color', t.border);
         r.style.setProperty('--btn-bg', t.btn);
-        particleMode = currentData.mode;
+        particleMode = mode;
         particles.forEach(p => p.reset());
     }
 
-    if (shindanId && shindanDatabase[shindanId]) {
-        currentData = shindanDatabase[shindanId];
-        applyTheme(currentData.theme);
-        document.title = currentData.title;
-        document.getElementById("progress-container").style.display = "block";
-        document.getElementById("action-area").innerHTML = `<button onclick="startQuestion()">診断を開始する</button><button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>`;
-        document.getElementById("main-text").innerText = currentData.title;
-        document.getElementById("question-number").innerText = "READY";
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
     }
 
     function goHome() {
         playHeavyClick();
-        window.location.href = window.location.pathname; // URLパラメータを消してトップへ
+        applyTheme(defaultTheme, 'default');
+        switchScreen('screen-menu');
+        document.title = "【極限超越】次元崩壊・超・診断占いシステム";
     }
 
-    function startQuestion() {
+    function startDiagnosis(id) {
         playHeavyClick();
-        loadQuestion();
+        currentData = shindanDatabase[id];
+        currentIdx = 0;
+        totalScore = 0;
+        
+        applyTheme(currentData.theme, currentData.mode);
+        document.title = currentData.title;
+        switchScreen('screen-quiz');
+        
+        document.getElementById("quiz-header").innerText = currentData.title;
+        document.getElementById("quiz-content").innerHTML = `<div class="main-text">${currentData.title}<br><br><span style="font-size:1rem;font-weight:normal;">全15問の診断を開始します。</span></div>`;
+        document.getElementById("quiz-action").innerHTML = `
+            <button onclick="loadQuestion()">診断を開始する</button>
+            <button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>
+        `;
     }
 
     function loadQuestion() {
@@ -492,11 +574,11 @@
         
         const prog = (currentIdx / currentData.questions.length) * 100;
         document.getElementById("progress-bar").style.width = prog + "%";
-        document.getElementById("question-number").innerText = `QUESTION: ${currentIdx + 1} / ${currentData.questions.length}`;
-        document.getElementById("main-text").innerText = currentData.questions[currentIdx].text;
+        document.getElementById("quiz-header").innerText = `QUESTION: ${currentIdx + 1} / ${currentData.questions.length}`;
         
-        const area = document.getElementById("action-area");
-        area.innerHTML = `
+        document.getElementById("quiz-content").innerHTML = `<div class="main-text">${currentData.questions[currentIdx].text}</div>`;
+        
+        document.getElementById("quiz-action").innerHTML = `
             <button onclick="answer(true)">はい / YES</button>
             <button onclick="answer(false)">いいえ / NO</button>
             <button class="home-btn" onclick="goHome()">🏠 ホームへ戻る</button>
@@ -512,16 +594,16 @@
 
     function showAdScreen() {
         document.getElementById("progress-bar").style.width = "100%";
-        document.getElementById("question-number").innerText = "ANALYZING...";
+        document.getElementById("quiz-header").innerText = "ANALYZING...";
         
-        document.getElementById("content-area").innerHTML = `
+        document.getElementById("quiz-content").innerHTML = `
             <div class="analyzer-container">
                 <div class="magic-circle"></div>
-                <div id="main-text" style="margin-top:20px; font-size:1.1rem; color:#ccc;">結果を解析中...</div>
+                <div class="main-text" style="margin-top:20px; font-size:1.1rem; color:#ccc;">深層心理を解析中...</div>
                 <div id="ad-timer" style="font-size:2rem; color:var(--accent-color); font-weight:bold;">5</div>
             </div>
         `;
-        document.getElementById("action-area").innerHTML = "";
+        document.getElementById("quiz-action").innerHTML = "";
 
         let t = 5;
         const intv = setInterval(() => {
@@ -533,12 +615,12 @@
 
     function showResult() {
         playHeavyClick();
+        document.getElementById("quiz-header").innerText = "RESULT";
         
-        document.getElementById("question-number").innerText = "RESULT";
         let res = currentData.results.find(r => totalScore <= r.maxScore) || currentData.results[currentData.results.length-1];
         
-        document.getElementById("content-area").innerHTML = `<div id="main-text" style="font-size:1.2rem; text-align:left; padding:10px;">${res.text}</div>`;
-        document.getElementById("action-area").innerHTML = `<a href="${window.location.pathname}" class="menu-btn" onclick="playHeavyClick()">🏠 トップに戻る</a>`;
+        document.getElementById("quiz-content").innerHTML = `<div class="main-text" style="font-size:1.2rem; text-align:left; padding:10px;">${res.text}</div>`;
+        document.getElementById("quiz-action").innerHTML = `<button class="menu-btn" onclick="goHome()">🏠 トップに戻る</button>`;
     }
 </script>
 
